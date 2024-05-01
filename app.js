@@ -2,7 +2,7 @@
 
 // import { AppMiddleware } from './src/app';
 const express = require('express');
-const { createNest, AppMiddleware } = require('./src/app');
+const AppMiddleware = require('./src/app');
 
 const app = express();
 app.get('/', (req, res) =>

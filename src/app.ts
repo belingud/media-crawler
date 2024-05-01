@@ -52,4 +52,4 @@ export class AppMiddleware implements NestMiddleware {
     return createNest(this.expressInstance);
   }
 }
-module.exports = { createNest, AppMiddleware };
+module.exports = AppMiddleware;
