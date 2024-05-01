@@ -1,10 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import * as compression from 'compression';
-import { AppModule } from './app.module';
+import { AppModule } from './src/app.module';
 import { ValidationPipe } from '@nestjs/common';
 // import { PORT } from './config';
-import { LoggingInterceptor } from './logger.interceptor';
+import { LoggingInterceptor } from './src/logger.interceptor';
 
 async function bootstrap() {
   // const app = await NestFactory.create(AppModule);
