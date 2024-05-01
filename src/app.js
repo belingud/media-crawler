@@ -3,12 +3,12 @@ import { ExpressAdapter } from '@nestjs/platform-express';
 import * as compression from 'compression';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-// import { PORT } from './config';
+import { PORT } from './config';
 import { LoggingInterceptor } from './logger.interceptor';
 
-async function bootstrap() {
+function bootstrap() {
   // const app = await NestFactory.create(AppModule);
-  const app = await NestFactory.create(AppModule, new ExpressAdapter());
+  const app = NestFactory.create(AppModule, new ExpressAdapter());
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new LoggingInterceptor());
@@ -22,8 +22,5 @@ async function bootstrap() {
   );
   return app;
 }
-bootstrap().then((c) => {
-  const app = c;
-  return app;
-});
+const app = bootstrap();
 module.exports = app;
