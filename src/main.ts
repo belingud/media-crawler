@@ -1,4 +1,8 @@
 import { NestFactory } from '@nestjs/core';
+import {
+  ExpressAdapter,
+  NestExpressApplication,
+} from '@nestjs/platform-express';
 import * as compression from 'compression';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
@@ -6,7 +10,11 @@ import { PORT } from './config';
 import { LoggingInterceptor } from './logger.interceptor';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(
+    AppModule,
+    new ExpressAdapter(),
+  );
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new LoggingInterceptor());
@@ -20,4 +28,4 @@ async function bootstrap() {
   );
   await app.listen(PORT);
 }
-bootstrap();
+bootstrap().then(() => console.log(`Application is running on: ${PORT}`));
