@@ -20,6 +20,7 @@ const logger_interceptor_1 = require("./logger.interceptor");
 async function bootstrap() {
     const expressApp = (0, express_1.default)();
     const app = await core_1.NestFactory.create(app_module_1.AppModule, new platform_express_1.ExpressAdapter(expressApp));
+    await app.init();
     app.enableCors();
     app.useGlobalPipes(new common_1.ValidationPipe());
     app.useGlobalInterceptors(new logger_interceptor_1.LoggingInterceptor());
@@ -37,12 +38,7 @@ const createNest = async (express) => {
     app.enableCors();
     app.useGlobalPipes(new common_1.ValidationPipe());
     app.useGlobalInterceptors(new logger_interceptor_1.LoggingInterceptor());
-    app.use(compression({
-        filter: () => {
-            return true;
-        },
-        threshold: -1,
-    }));
+    app.use(compression());
     return app;
 };
 let AppMiddleware = class AppMiddleware {

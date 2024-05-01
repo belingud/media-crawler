@@ -8,9 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
-const demo_module_1 = require("./demo/demo.module");
 const api_module_1 = require("./api/api.module");
-const throttler_1 = require("@nestjs/throttler");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -18,13 +16,6 @@ exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
             api_module_1.ApiModule,
-            demo_module_1.DemoModule,
-            throttler_1.ThrottlerModule.forRoot([
-                {
-                    ttl: 60000,
-                    limit: 10,
-                },
-            ]),
         ],
     })
 ], AppModule);

@@ -15,6 +15,7 @@ async function bootstrap() {
     AppModule,
     new ExpressAdapter(expressApp),
   );
+  await app.init();
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new LoggingInterceptor());
@@ -37,14 +38,7 @@ const createNest = async (express: Express.Application) => {
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new LoggingInterceptor());
-  app.use(
-    compression({
-      filter: () => {
-        return true; // always compress
-      },
-      threshold: -1, // default
-    }),
-  );
+  app.use(compression());
   return app;
 };
 
