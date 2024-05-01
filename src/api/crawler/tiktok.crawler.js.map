@@ -1,1 +1,0 @@
-{"version":3,"file":"tiktok.crawler.js","sourceRoot":"","sources":["tiktok.crawler.ts"],"names":[],"mappings":";;;AAAA,iDAA6C;AAE7C,MAAa,aAAc,SAAQ,0BAAW;IAC5C,cAAc,GAAW;QACvB,YAAY,EACV,iHAAiH;KACpH,CAAC;IACF,iBAAiB,CAAC,OAAe;QAC/B,OAAO;YACL,YAAY,EAAE,IAAI,CAAC,cAAc,CAAC,YAAY,CAAC;YAC/C,OAAO,EAAE,uEAAuE,OAAO,EAAE;SAC1F,CAAC;IACJ,CAAC;CACF;AAXD,sCAWC"}
