@@ -56,5 +56,5 @@ exports.AppMiddleware = AppMiddleware = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [Object])
 ], AppMiddleware);
-module.exports = AppMiddleware;
+module.exports = { createNest, AppMiddleware };
 //# sourceMappingURL=app.js.map
