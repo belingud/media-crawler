@@ -4,10 +4,10 @@ const esbuild = require('esbuild');
 const fs = require('fs');
 
 // dynamic-required files
-const dynamicRequiredDirs = ['views'];
+const dynamicRequiredDirs = [];
 
 // static files
-const staticFileDirs = ['public'];
+const staticFileDirs = [];
 
 // Remove old output
 if (fs.existsSync('.zeabur/output')) {
