@@ -1,7 +1,9 @@
 // scripts/build.js
 
-import esbuild from 'esbuild';
-import fs from 'fs';
+const esbuild = require('esbuild');
+const fs = require('fs');
+// import esbuild from 'esbuild';
+// import fs from 'fs';
 
 // dynamic-required files
 const dynamicRequiredDirs = [];
