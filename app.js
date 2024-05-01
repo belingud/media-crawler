@@ -34,27 +34,27 @@ Commercial support is available at
 </html>
 `),
 );
-// app.use((req, res, next) => {
-//   const nest = new AppMiddleware(app).use(req, res, next);
-//   nest
-//     .then(() => {
-//       next();
-//     })
-//     .catch((err) => {
-//       console.log(JSON.stringify(err));
-//       next();
-//     });
-// });
-async function mountSubApp(app, mountPath, subAppBoot) {
-  const subApp = await subAppBoot();
+app.use((req, res, next) => {
+  const nest = new AppMiddleware(app).use(req, res, next);
+  nest
+    .then(() => {
+      next();
+    })
+    .catch((err) => {
+      console.log(JSON.stringify(err));
+      next();
+    });
+});
+// async function mountSubApp(app, mountPath, subAppBoot) {
+//   const subApp = await subAppBoot();
 
-  app.use(mountPath, subApp.getHttpAdapter().getInstance());
-  return app;
-}
+//   app.use(mountPath, subApp.getHttpAdapter().getInstance());
+//   return app;
+// }
 
-(async () => {
-  global.napp = await mountSubApp(app, '/nest', createNest);
-})();
-module.exports = global.napp;
+// (async () => {
+//   global.napp = await mountSubApp(app, '/nest', createNest);
+// })();
+// module.exports = global.napp;
 // app.listen(3000);
 // global.napp.listen(3000);
