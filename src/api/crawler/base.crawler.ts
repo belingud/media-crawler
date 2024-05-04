@@ -3,7 +3,7 @@ import { Platform } from '../../pkg/enum';
 import { findUrl } from '../../pkg/util';
 import { Injectable, NotImplementedException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { UserAgent } from '../../config';
+import { UserAgent } from '../../config.api';
 
 @Injectable()
 export class BaseCrawler {

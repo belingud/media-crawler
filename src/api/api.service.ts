@@ -3,7 +3,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { firstValueFrom, lastValueFrom, map } from 'rxjs';
 import { AxiosRequestConfig } from 'axios';
 import { findUrl, genParams, generateXBogus } from '../pkg/util';
-import { DouYinCookies, TikTokApiUrl, UserAgent } from '../config';
+import { DouYinCookies, TikTokApiUrl, UserAgent } from '../config.api';
 // import { XBogus } from '../pkg/xbogus';
 // import { genMSToken } from './tokenManager';
 import { getDouyinDetailParams } from './params';

@@ -1,4 +1,4 @@
-import { DouYinCookies, UserAgent } from '../../config';
+import { DouYinCookies, UserAgent } from '../../config.api';
 import { BaseCrawler } from './base.crawler';
 import { sign } from '../../pkg/X-Bogus';
 import { getDouyinDetailParams } from '../params';

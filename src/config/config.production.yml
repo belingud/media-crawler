@@ -1,5 +1,5 @@
 ---
-NODE_ENV: development
+NODE_ENV: production
 HTTPS_KEY: "src/secret/privkey.pem"
 HTTPS_CERT: "src/secret/fullchain.pem"
 PORT: 3000

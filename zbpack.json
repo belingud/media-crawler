@@ -1,4 +1,0 @@
-{
-  "serverless": true,
-  "start_command": "node dist/main"
-}
