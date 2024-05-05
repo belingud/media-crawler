@@ -43,8 +43,10 @@ async function bootstrap() {
   const port = configService.get('PORT');
   if (dev) {
     await app.listen(port || 3000);
-    console.log(`Application is running on: ${port || 3000}`);
+    console.log(`HTTP application is running on: ${await app.getUrl()}`);
   }
-  https.createServer(httpsOptions, server).listen(443);
+  const httpsPort: number = configService.get('HTTPS_PORT') || 443;
+  https.createServer(httpsOptions, server).listen(httpsPort);
+  console.log(`HTTPS application is running on port: ${httpsPort}`);
 }
 bootstrap();

@@ -5,8 +5,8 @@
   "compilerOptions": {
     "assets": [
       { "include": "**/config/*.yml", "outDir": "./dist/src/" },
-      { "include": "**/*.yaml" },
-      { "include": "**/*.pem" }
+      { "include": "**/*.yaml", "outDir": "./dist/src" },
+      { "include": "**/*.pem", "outDir": "./dist/src" }
     ],
     "watchAssets":true,
     "deleteOutDir": true
