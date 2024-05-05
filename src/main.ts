@@ -10,17 +10,11 @@ import { ConfigService } from '@nestjs/config';
 import { LoggingInterceptor } from './logger.interceptor';
 import * as express from 'express';
 import * as fs from 'fs';
-import * as path from 'path';
 import * as https from 'https';
 
 const dev = process.env.NODE_ENV !== 'production';
 
 console.log('Environment: ', process.env.NODE_ENV);
-
-const httpsOptions = {
-  key: fs.readFileSync(path.join(__dirname, '../../src/secret/privkey.pem')),
-  cert: fs.readFileSync(path.join(__dirname, '../../src/secret/fullchain.pem')),
-};
 
 async function bootstrap() {
   const server = express();
@@ -45,6 +39,10 @@ async function bootstrap() {
     await app.listen(port || 3000);
     console.log(`HTTP application is running on: ${await app.getUrl()}`);
   }
+  const httpsOptions = {
+    key: fs.readFileSync(configService.get('HTTPS_KEY')),
+    cert: fs.readFileSync(configService.get('HTTPS_CERT')),
+  };
   const httpsPort: number = configService.get('HTTPS_PORT') || 443;
   https.createServer(httpsOptions, server).listen(httpsPort);
   console.log(`HTTPS application is running on port: ${httpsPort}`);
