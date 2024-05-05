@@ -24,11 +24,11 @@ export const configuration: ConfigFactory<AppConfig> = () => {
   const yamlConfig = yaml.load(
     readFileSync(join(__dirname, YAML_CONFIG_FILENAME), 'utf8'),
   ) as Record<string, any>; // Use `any` or a more specific type if possible
-  if (yamlConfig.HTTPS_KEY) {
-    yamlConfig.HTTPS_KEY = join(ROOT, yamlConfig.HTTPS_KEY);
+  if (yamlConfig.https_key) {
+    yamlConfig.https_key = join(ROOT, yamlConfig.https_key);
   }
-  if (yamlConfig.HTTPS_CERT) {
-    yamlConfig.HTTPS_CERT = join(ROOT, yamlConfig.HTTPS_CERT);
+  if (yamlConfig.https_cert) {
+    yamlConfig.https_cert = join(ROOT, yamlConfig.https_cert);
   }
 
   return yamlConfig as AppConfig;
