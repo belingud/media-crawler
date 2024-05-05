@@ -3,6 +3,7 @@ NODE_ENV: development
 HTTPS_KEY: "src/secret/privkey.pem"
 HTTPS_CERT: "src/secret/fullchain.pem"
 PORT: 3000
+HTTPS_PORT: 5000
 info:
   title: "crawler_signer API"
   version: 0.0.1

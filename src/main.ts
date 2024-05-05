@@ -34,17 +34,20 @@ async function bootstrap() {
     }),
   );
   const configService = app.get(ConfigService);
-  const port = configService.get('PORT');
+  const port = configService.get<number>('PORT');
   if (dev) {
+    // Use http in development env
     await app.listen(port || 3000);
     console.log(`HTTP application is running on: ${await app.getUrl()}`);
+  } else {
+    const httpsOptions = {
+      key: fs.readFileSync(configService.get<string>('HTTPS_KEY')),
+      cert: fs.readFileSync(configService.get<string>('HTTPS_CERT')),
+    };
+    // Use https in production env
+    const httpsPort: number = configService.get<number>('HTTPS_PORT') || 443;
+    https.createServer(httpsOptions, server).listen(httpsPort);
+    console.log(`HTTPS application is running on port: ${httpsPort}`);
   }
-  const httpsOptions = {
-    key: fs.readFileSync(configService.get('HTTPS_KEY')),
-    cert: fs.readFileSync(configService.get('HTTPS_CERT')),
-  };
-  const httpsPort: number = configService.get('HTTPS_PORT') || 443;
-  https.createServer(httpsOptions, server).listen(httpsPort);
-  console.log(`HTTPS application is running on port: ${httpsPort}`);
 }
 bootstrap();
