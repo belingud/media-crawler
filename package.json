@@ -20,7 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "engines": {
-    "node": "18.20.2"
+    "node": ">18"
   },
   "dependencies": {
     "@nestjs/axios": "^3.0.2",
@@ -82,5 +82,6 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  }
+  },
+  "packageManager": "yarn@4.2.1"
 }

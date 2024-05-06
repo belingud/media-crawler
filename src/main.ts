@@ -1,22 +1,21 @@
 import { NestFactory } from '@nestjs/core';
 import * as compression from 'compression';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { NestApplicationOptions, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { LoggingInterceptor } from './logger.interceptor';
 import * as fs from 'fs';
 import * as path from 'path';
-import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.interface';
 
 const dev = process.env.NODE_ENV !== 'production';
 
 console.log('Environment: ', process.env.NODE_ENV);
 
 async function bootstrap() {
-  let httpsOptions: HttpsOptions = {};
+  let options: NestApplicationOptions = { cors: true };
   if (!dev) {
     console.log(__dirname);
-    httpsOptions = {
+    options.httpsOptions = {
       key: fs.readFileSync(
         path.join(__dirname, '../../src/secret/privkey.pem'),
       ),
@@ -25,16 +24,7 @@ async function bootstrap() {
       ),
     };
   }
-  const app = await NestFactory.create(AppModule, {
-    httpsOptions: httpsOptions,
-    // cors: true,
-  });
-  app.enableCors({
-    origin: '*', // 允许访问的域
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS', // 允许的HTTP请求方法
-    allowedHeaders: 'Content-Type, Accept', // 允许的HTTP请求头
-    credentials: true, // 控制是否应该暴露给前端JavaScript代码
-  });
+  const app = await NestFactory.create(AppModule, options);
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new LoggingInterceptor());
   app.use(
@@ -55,7 +45,7 @@ async function bootstrap() {
     // Use https in production env
     const httpsPort: number = configService.get<number>('https_port') || 8000;
     await app.listen(httpsPort);
-    console.log(`HTTPS application is running on port: ${httpsPort}`);
+    console.log(`HTTPS application is running on port: ${await app.getUrl()}`);
   }
 }
 bootstrap();
