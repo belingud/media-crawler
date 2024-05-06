@@ -6,13 +6,14 @@ import { ConfigService } from '@nestjs/config';
 import { LoggingInterceptor } from './logger.interceptor';
 import * as fs from 'fs';
 import * as path from 'path';
+import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.interface';
 
 const dev = process.env.NODE_ENV !== 'production';
 
 console.log('Environment: ', process.env.NODE_ENV);
 
 async function bootstrap() {
-  let httpsOptions = {};
+  let httpsOptions: HttpsOptions = {};
   if (!dev) {
     console.log(__dirname);
     httpsOptions = {
@@ -24,8 +25,16 @@ async function bootstrap() {
       ),
     };
   }
-  const app = await NestFactory.create(AppModule, { httpsOptions });
-  app.enableCors();
+  const app = await NestFactory.create(AppModule, {
+    httpsOptions: httpsOptions,
+    // cors: true,
+  });
+  app.enableCors({
+    origin: '*', // 允许访问的域
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // 允许的HTTP请求方法
+    allowedHeaders: 'Content-Type, Accept', // 允许的HTTP请求头
+    credentials: true, // 控制是否应该暴露给前端JavaScript代码
+  });
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new LoggingInterceptor());
   app.use(
