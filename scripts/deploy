@@ -1,3 +1,8 @@
+!/usr/bin/env bash
+echo "Deploying..."
+echo "Start yarn package install..."
 yarn
+echo "Start build..."
 yarn build
+echo "Start pm2 restart..."
 pm2 restart media-crawler

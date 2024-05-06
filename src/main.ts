@@ -31,7 +31,7 @@ async function bootstrap() {
   });
   app.enableCors({
     origin: '*', // 允许访问的域
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // 允许的HTTP请求方法
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS', // 允许的HTTP请求方法
     allowedHeaders: 'Content-Type, Accept', // 允许的HTTP请求头
     credentials: true, // 控制是否应该暴露给前端JavaScript代码
   });
