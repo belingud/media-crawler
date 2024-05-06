@@ -1,28 +1,30 @@
 import { NestFactory } from '@nestjs/core';
-import {
-  ExpressAdapter,
-  NestExpressApplication,
-} from '@nestjs/platform-express';
 import * as compression from 'compression';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { LoggingInterceptor } from './logger.interceptor';
-import * as express from 'express';
 import * as fs from 'fs';
-import * as https from 'https';
-import { ShutdownObserver } from './shutdown.observer';
+import * as path from 'path';
 
 const dev = process.env.NODE_ENV !== 'production';
 
 console.log('Environment: ', process.env.NODE_ENV);
 
 async function bootstrap() {
-  const server = express();
-  const app = await NestFactory.create<NestExpressApplication>(
-    AppModule,
-    new ExpressAdapter(server),
-  );
+  let httpsOptions = {};
+  if (!dev) {
+    console.log(__dirname);
+    httpsOptions = {
+      key: fs.readFileSync(
+        path.join(__dirname, '../../src/secret/privkey.pem'),
+      ),
+      cert: fs.readFileSync(
+        path.join(__dirname, '../../src/secret/fullchain.pem'),
+      ),
+    };
+  }
+  const app = await NestFactory.create(AppModule, { httpsOptions });
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new LoggingInterceptor());
@@ -36,24 +38,15 @@ async function bootstrap() {
   );
   const configService = app.get(ConfigService);
   const port = configService.get<number>('port');
-  const shutdownObserver = app.get(ShutdownObserver);
   if (dev) {
     // Use http in development env
     await app.listen(port || 3000);
     console.log(`HTTP application is running on: ${await app.getUrl()}`);
   } else {
-    const httpsOptions = {
-      key: fs.readFileSync(configService.get<string>('https_key')),
-      cert: fs.readFileSync(configService.get<string>('https_cert')),
-    };
     // Use https in production env
-    const httpsPort: number = configService.get<number>('https_port') || 5000;
-    console.log(`https port from config: ${configService.get('https_port')}`);
-    const httpsServer = https
-      .createServer(httpsOptions, server)
-      .listen(httpsPort);
+    const httpsPort: number = configService.get<number>('https_port') || 8000;
+    await app.listen(httpsPort);
     console.log(`HTTPS application is running on port: ${httpsPort}`);
-    shutdownObserver.addHttpServer(httpsServer);
   }
 }
 bootstrap();

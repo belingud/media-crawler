@@ -3,7 +3,7 @@ NODE_ENV: production
 https_key: "src/secret/privkey.pem"
 https_cert: "src/secret/fullchain.pem"
 port: 3000
-https_port: 5000
+https_port: 8000
 info:
   title: "crawler_signer API"
   version: 0.0.1
