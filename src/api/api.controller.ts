@@ -19,7 +19,6 @@ export class ApiController {
 
   @Get('/api')
   async getInfo(
-    @Req() request: Request,
     @Res() res: Response,
     @Query('url') url: string,
     @Query('minimal', ParseBoolPipe) minimal: boolean = false,

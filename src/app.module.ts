@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-// import { DemoModule } from './demo/demo.module';
-import { ConfigModule } from '@nestjs/config';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ApiModule } from './api/api.module';
 import { configuration } from './config/configuration';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
         limit: 10, // 10 requests
       },
     ]),
+    CacheModule.register(),
   ],
 })
 export class AppModule {}

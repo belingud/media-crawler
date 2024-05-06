@@ -4,7 +4,7 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import { Observable, tap } from 'rxjs';
+import { catchError, Observable, tap, throwError } from 'rxjs';
 
 /**
  * Logs a message with the given prefix, method, path, status, and elapsed time.
@@ -48,7 +48,8 @@ export class LoggingInterceptor implements NestInterceptor {
 
     const start = Date.now();
     return next.handle().pipe(
-      tap(() => {
+      tap((data) => {
+        console.log(data);
         const res = context.getArgByIndex(1);
         log(
           console.log,
@@ -58,6 +59,10 @@ export class LoggingInterceptor implements NestInterceptor {
           res.statusCode,
           Date.now() - start,
         );
+      }),
+      catchError((err) => {
+        console.error(`Error: [${method}] ${url}`, err);
+        return throwError(() => new Error(err));
       }),
     );
   }
