@@ -11,6 +11,7 @@ import { LoggingInterceptor } from './logger.interceptor';
 import * as express from 'express';
 import * as fs from 'fs';
 import * as https from 'https';
+import { ShutdownObserver } from './shutdown.observer';
 
 const dev = process.env.NODE_ENV !== 'production';
 
@@ -35,6 +36,7 @@ async function bootstrap() {
   );
   const configService = app.get(ConfigService);
   const port = configService.get<number>('port');
+  const shutdownObserver = app.get(ShutdownObserver);
   if (dev) {
     // Use http in development env
     await app.listen(port || 3000);
@@ -47,8 +49,11 @@ async function bootstrap() {
     // Use https in production env
     const httpsPort: number = configService.get<number>('https_port') || 5000;
     console.log(`https port from config: ${configService.get('https_port')}`);
-    https.createServer(httpsOptions, server).listen(httpsPort);
+    const httpsServer = https
+      .createServer(httpsOptions, server)
+      .listen(httpsPort);
     console.log(`HTTPS application is running on port: ${httpsPort}`);
+    shutdownObserver.addHttpServer(httpsServer);
   }
 }
 bootstrap();
