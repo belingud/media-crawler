@@ -1,9 +1,12 @@
+import 'dotenv/config';
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NestFactory } from '@nestjs/core';
 import * as compression from 'compression';
 import { AppModule } from './app.module';
 import { NestApplicationOptions, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { LoggingInterceptor } from './logger.interceptor';
+import { configInstance } from './config/configuration';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -17,10 +20,10 @@ async function bootstrap() {
     console.log(__dirname);
     options.httpsOptions = {
       key: fs.readFileSync(
-        path.join(__dirname, '../../src/secret/privkey.pem'),
+        path.join(__dirname, '../../' + process.env.HTTPS_KEY),
       ),
       cert: fs.readFileSync(
-        path.join(__dirname, '../../src/secret/fullchain.pem'),
+        path.join(__dirname, '../../' + process.env.HTTPS_CERT),
       ),
     };
   }
@@ -36,14 +39,14 @@ async function bootstrap() {
     }),
   );
   const configService = app.get(ConfigService);
-  const port = configService.get<number>('port');
+  const port = configService.get<number>('PORT');
   if (dev) {
     // Use http in development env
     await app.listen(port || 3000);
     console.log(`HTTP application is running on: ${await app.getUrl()}`);
   } else {
     // Use https in production env
-    const httpsPort: number = configService.get<number>('https_port') || 8000;
+    const httpsPort: number = configService.get<number>('HTTPS_PORT') || 8000;
     await app.listen(httpsPort);
     console.log(`HTTPS application is running on port: ${await app.getUrl()}`);
   }

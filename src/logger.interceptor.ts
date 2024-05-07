@@ -49,7 +49,7 @@ export class LoggingInterceptor implements NestInterceptor {
     const start = Date.now();
     return next.handle().pipe(
       tap((data) => {
-        console.log(data);
+        if (!data) return;
         const res = context.getArgByIndex(1);
         log(
           console.log,
@@ -61,7 +61,7 @@ export class LoggingInterceptor implements NestInterceptor {
         );
       }),
       catchError((err) => {
-        console.error(`Error: [${method}] ${url}`, err);
+        console.log(`--> Error: [${method}] ${url}`, err);
         throw err;
       }),
     );

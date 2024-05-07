@@ -1,4 +1,5 @@
 import { sign } from './X-Bogus';
+import * as crypto from 'crypto';
 // import { sign } from './tmp-xbogus';
 /**
  * Find and return the first URL in the input text.
@@ -52,4 +53,14 @@ export function getTimeStamp(unit: string = 'milli'): number {
     case 'min':
       return Math.floor(new Date().getTime() / 1000 / 60);
   }
+}
+
+/**
+ * Generates an MD5 hash for the given string.
+ *
+ * @param {string} str - The string to generate the hash for.
+ * @return {string} The MD5 hash of the input string.
+ */
+export function generateMD5Hash(str: string): string {
+  return crypto.createHash('md5').update(str, 'utf8').digest('hex');
 }
