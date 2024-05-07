@@ -15,7 +15,7 @@ import { Response } from 'express';
 export class ApiController {
   constructor(private readonly appService: ApiService) {}
 
-  @Get('/api')
+  @Get('/hyperparse')
   async getInfo(
     @Res() res: Response,
     @Query('url') url: string,

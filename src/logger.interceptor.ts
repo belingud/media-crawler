@@ -62,7 +62,7 @@ export class LoggingInterceptor implements NestInterceptor {
       }),
       catchError((err) => {
         console.error(`Error: [${method}] ${url}`, err);
-        return throwError(() => new Error(err));
+        throw err;
       }),
     );
   }
