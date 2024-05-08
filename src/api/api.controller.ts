@@ -32,9 +32,8 @@ export class ApiController {
     }
     const key = generateMD5Hash(`url:${url},minimal:${minimal}`);
     const value = await this.cacheManager.get(key);
-    console.log(value);
     if (value) {
-      return value;
+      return res.status(HttpStatus.OK).json(value);
     }
     await this.appService
       .hybridParsing(url)
