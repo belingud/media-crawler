@@ -5,6 +5,9 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { catchError, Observable, tap } from 'rxjs';
+import { Logger } from 'winston';
+
+// const logger: Logger = new Logger('LogInterceptor', loggerOptions);
 
 /**
  * Logs a message with the given prefix, method, path, status, and elapsed time.
@@ -33,6 +36,7 @@ function log(
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
+  constructor(private readonly logger: Logger) {}
   /**
    * Intercepts the incoming request and logs the method and URL.
    *
@@ -44,14 +48,14 @@ export class LoggingInterceptor implements NestInterceptor {
     const incoming = context.getArgByIndex(0);
     const method: string = incoming.method;
     const url: string = incoming.url;
-    log(console.log, '<--', method, url);
+    log(this.logger.info, '<--', method, url);
 
     const start = Date.now();
     return next.handle().pipe(
       tap(() => {
         const res = context.getArgByIndex(1);
         log(
-          console.log,
+          this.logger.info,
           '-->',
           method,
           url,
@@ -60,7 +64,7 @@ export class LoggingInterceptor implements NestInterceptor {
         );
       }),
       catchError((err) => {
-        console.log(`--> Error: [${method}] ${url}`, err);
+        this.logger.error(`--> Error: [${method}] ${url}`, err);
         throw err;
       }),
     );

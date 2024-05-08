@@ -61,6 +61,6 @@ export function getTimeStamp(unit: string = 'milli'): number {
  * @param {string} str - The string to generate the hash for.
  * @return {string} The MD5 hash of the input string.
  */
-export function generateMD5Hash(str: string): string {
+export function genMD5Hash(str: string): string {
   return crypto.createHash('md5').update(str, 'utf8').digest('hex');
 }

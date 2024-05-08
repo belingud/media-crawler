@@ -6,6 +6,8 @@ module.exports = {
       watch: false,
       namespace: 'crawler',
       autorestart: true,
+      max_restarts: 5, // 最大异常重启次数
+      restart_delay: 10, // 异常重启情况下，延时重启时间
     },
   ],
 };

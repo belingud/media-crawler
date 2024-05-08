@@ -8,17 +8,20 @@ import {
   InternalServerErrorException,
   ParseBoolPipe,
   Inject,
+  Logger,
 } from '@nestjs/common';
 import { ApiService } from './api.service';
 import { Response } from 'express';
 import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
-import { generateMD5Hash } from 'src/pkg/util';
+import { genMD5Hash } from 'src/pkg/util';
 
 @Controller('/')
 export class ApiController {
+  // 使用nestjs默认的logger
   constructor(
     private readonly appService: ApiService,
     @Inject(CACHE_MANAGER) private readonly cacheManager: CacheStore,
+    private readonly logger: Logger,
   ) {}
 
   @Get('/hyperparse')
@@ -30,7 +33,7 @@ export class ApiController {
     if (!url) {
       throw new BadRequestException('Url is required');
     }
-    const key = generateMD5Hash(`url:${url},minimal:${minimal}`);
+    const key = genMD5Hash(`url:${url},minimal:${minimal}`);
     const value = await this.cacheManager.get(key);
     if (value) {
       return res.status(HttpStatus.OK).json(value);
@@ -45,7 +48,7 @@ export class ApiController {
         res.status(HttpStatus.OK).json(data);
       })
       .catch((err) => {
-        console.log(`Parse url error: ${err}`);
+        this.logger.error(`Parse url error: ${err}`);
         throw new InternalServerErrorException('Parse url error');
       });
   }

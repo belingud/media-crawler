@@ -1,14 +1,14 @@
 import 'dotenv/config';
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { NestFactory } from '@nestjs/core';
-import * as compression from 'compression';
-import { AppModule } from './app.module';
-import { NestApplicationOptions, ValidationPipe } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { LoggingInterceptor } from './logger.interceptor';
-import { configInstance } from './config/configuration';
 import * as fs from 'fs';
 import * as path from 'path';
+import { NestFactory } from '@nestjs/core';
+import * as compression from 'compression';
+import { NestApplicationOptions, ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+
+import { AppModule } from './app.module';
+import { LoggingInterceptor } from './logging.interceptor';
+import { logger, loggerService } from './logger';
 
 const dev = process.env.NODE_ENV !== 'production';
 
@@ -29,7 +29,8 @@ async function bootstrap() {
   }
   const app = await NestFactory.create(AppModule, options);
   app.useGlobalPipes(new ValidationPipe());
-  app.useGlobalInterceptors(new LoggingInterceptor());
+  app.useLogger(loggerService);
+  app.useGlobalInterceptors(new LoggingInterceptor(logger));
   app.use(
     compression({
       filter: () => {
@@ -43,12 +44,12 @@ async function bootstrap() {
   if (dev) {
     // Use http in development env
     await app.listen(port || 3000);
-    console.log(`HTTP application is running on: ${await app.getUrl()}`);
+    logger.info(`HTTP application is running on: ${await app.getUrl()}`);
   } else {
     // Use https in production env
     const httpsPort: number = configService.get<number>('HTTPS_PORT') || 8000;
     await app.listen(httpsPort);
-    console.log(`HTTPS application is running on port: ${await app.getUrl()}`);
+    logger.info(`HTTPS application is running on port: ${await app.getUrl()}`);
   }
 }
 bootstrap();

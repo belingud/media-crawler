@@ -1,9 +1,9 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { firstValueFrom, lastValueFrom, map } from 'rxjs';
 import { AxiosRequestConfig } from 'axios';
 import { findUrl, genParams, generateXBogus } from '../pkg/util';
-import { DouYinCookies, TikTokApiUrl, UserAgent } from '../config.api';
+import { DouYinCookies, TikTokApiUrl, UserAgent } from '../api.config';
 // import { XBogus } from '../pkg/xbogus';
 // import { genMSToken } from './tokenManager';
 import { getDouyinDetailParams } from './params';
@@ -19,7 +19,10 @@ enum Platform {
 
 @Injectable()
 export class ApiService {
-  constructor(private readonly http: HttpService) {}
+  constructor(
+    private readonly http: HttpService,
+    private readonly logger: Logger,
+  ) {}
   #headers: object = {
     'User-Agent': UserAgent,
   };
@@ -86,7 +89,7 @@ export class ApiService {
     if (!platform) {
       throw new Error('Unsupported platform');
     }
-    console.log(`Start to parse ${platform} url: ${url}`);
+    this.logger.log(`Start to parse ${platform} url: ${url}`);
     const awemeID = await this.getAwemeID(url, platform);
     if (!awemeID) {
       throw new Error(`Get ${platform} media id Failed`);
@@ -103,11 +106,11 @@ export class ApiService {
       case Platform.kuaishou:
         return awemeData;
     }
-    console.log(`Get ${platform} video data success, judge media type...`);
+    this.logger.log(`Get ${platform} video data success, judge media type...`);
     const awemeTypeCode = awemeData['aweme_type'];
     const awemeType = this.#awemeTypeMap[awemeTypeCode];
-    console.log(`Get ${platform} video type: ${awemeType}`);
-    console.log(`Start to format data...`);
+    this.logger.log(`Get ${platform} video type: ${awemeType}`);
+    this.logger.log(`Start to format data...`);
     let result = {
       status: 'success',
       message: '',
@@ -135,7 +138,7 @@ export class ApiService {
         switch (awemeType) {
           // Generate douyin video data
           case 'video':
-            console.log('Start to format douyin video data');
+            this.logger.log('Start to format douyin video data');
             let uri = awemeData['video']['play_addr']['uri'];
             let wm_video_url = awemeData['video']['play_addr']['url_list'][0];
             let wm_video_url_HQ = `https://aweme.snssdk.com/aweme/v1/playwm/?video_id=${uri}&radio=1080p&line=0`;
@@ -152,7 +155,7 @@ export class ApiService {
             break;
           // Generate douyin image data
           case 'image':
-            console.log('Start to format douyin image data');
+            this.logger.log('Start to format douyin image data');
             // 无水印图片列表/No watermark image list
             let noWatermarkImageList: string[] = [];
             // 有水印图片列表/With watermark image list
@@ -178,7 +181,7 @@ export class ApiService {
         switch (awemeType) {
           // Generate tiktok video data
           case 'video':
-            console.log('Start to format tiktok video data');
+            this.logger.log('Start to format tiktok video data');
             const wmVideo = awemeData['video']['download_addr']['url_list'][0];
             apiData = {
               video_data: {
@@ -192,7 +195,7 @@ export class ApiService {
             break;
           // Generate tiktok image data
           case 'image':
-            console.log('Start to format tiktok image data');
+            this.logger.log('Start to format tiktok image data');
             // 无水印图片列表/No watermark image list
             let noWatermarkImageList: string[] = [];
             // 有水印图片列表/With watermark image list
@@ -283,7 +286,7 @@ export class ApiService {
     const xb = generateXBogus(queryString, this.#douyinHeaders['User-Agent']);
     // const xb = new XBogus(this.#headers['User-Agent']).sign(queryString)[1];
     let targetUrl: string = withParams + `&X-Bogus=${xb}`;
-    console.log(`Start to query url: ${targetUrl}`);
+    this.logger.log(`Start to query url: ${targetUrl}`);
     const requestConfig: AxiosRequestConfig = {
       headers: this.#douyinHeaders,
     };
@@ -346,7 +349,7 @@ export class ApiService {
     } else if (url.includes('note')) {
       mediaID = url.match(/\/note\/(\d+)/i)[1];
     }
-    console.log(`Get media id: ${mediaID}`);
+    this.logger.log(`Get media id: ${mediaID}`);
     return mediaID;
   }
 
@@ -356,7 +359,7 @@ export class ApiService {
       /**Get douyin original url, except receive 302 response, get url from header */
       if (url.includes('v.douyin')) {
         url = url.match(/(https:\/\/v.douyin.com\/)\w+/i)[0];
-        console.log(`Get orginal url by ${Platform.douyin} share url...`);
+        this.logger.log(`Get orginal url by ${Platform.douyin} share url...`);
         await firstValueFrom(
           this.http.get(url, {
             headers: this.#headers,
@@ -366,14 +369,14 @@ export class ApiService {
           if (err.response.status === 302) {
             url = err.response.headers.location.split('?')[0];
           }
-          console.log(`Get original url success: ${url}`);
+          this.logger.log(`Get original url success: ${url}`);
         });
       } else {
-        console.log(`No need to convert: ${url}`);
+        this.logger.log(`No need to convert: ${url}`);
         return url;
       }
     }
-    console.log('return url ' + url);
+    this.logger.log('return url ' + url);
     return url;
   }
 
@@ -412,7 +415,7 @@ export class ApiService {
     let data = await lastValueFrom(
       this.http.get(TikTokApiUrl, axiosConfig).pipe(map((res) => res.data)),
     ).catch((error) => {
-      console.log(error);
+      this.logger.log(error);
       throw new NotFoundException('Media not found');
     });
     const awemeData = data['aweme_list'][0];
