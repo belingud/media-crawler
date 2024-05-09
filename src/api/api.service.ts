@@ -435,6 +435,8 @@ export class ApiService {
       platform: data['platform'],
       type: data['type'],
       desc: data['desc'],
+      aweme_id: data['aweme_id'],
+      nick_name: data['nick_name'],
       wm_video_url:
         data['type'] === 'video' ? data['video_data']['wm_video_url'] : null,
       wm_video_url_HQ:
