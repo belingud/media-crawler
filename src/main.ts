@@ -16,7 +16,7 @@ console.log('Environment: ', process.env.NODE_ENV);
 
 async function bootstrap() {
   let options: NestApplicationOptions = { cors: true };
-  if (false) {
+  if (!dev) {
     console.log(__dirname);
     options.httpsOptions = {
       key: fs.readFileSync(
@@ -41,10 +41,6 @@ async function bootstrap() {
   );
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT');
-  const httpsPort: number = configService.get<number>('HTTPS_PORT') || 8000;
-  await app.listen(httpsPort);
-  logger.info(`HTTP application is running on port: ${await app.getUrl()}`);
-  return;
   if (dev) {
     // Use http in development env
     await app.listen(port || 3000);
