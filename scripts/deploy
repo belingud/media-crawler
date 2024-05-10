@@ -1,5 +1,6 @@
-!/usr/bin/env bash
-echo "Deploying..."
+#!/usr/bin/env bash
+echo "Start to deploying..."
++echo "Latest commit message and hash: $(git rev-parse HEAD) $(git log --format=%B --no-patch HEAD -1)"
 echo "Start yarn package install..."
 yarn
 echo "Start build..."
