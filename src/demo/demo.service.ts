@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return `
+    getHello(): string {
+        return `
     <!DOCTYPE html>
     <html>
     <head>
@@ -30,5 +30,5 @@ export class AppService {
     </body>
     </html>
     `;
-  }
+    }
 }

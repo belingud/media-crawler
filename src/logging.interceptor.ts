@@ -1,8 +1,8 @@
 import {
-  CallHandler,
-  ExecutionContext,
-  Injectable,
-  NestInterceptor,
+    CallHandler,
+    ExecutionContext,
+    Injectable,
+    NestInterceptor,
 } from '@nestjs/common';
 import { catchError, Observable, tap } from 'rxjs';
 import { Logger } from 'winston';
@@ -20,53 +20,53 @@ import { Logger } from 'winston';
  * @param {any} [elapsed=undefined] - The elapsed time of the request (default: undefined).
  */
 function log(
-  fn: CallableFunction,
-  prefix: string,
-  method: string,
-  path: any,
-  status: number = 0,
-  elapsed: any = undefined,
+    fn: CallableFunction,
+    prefix: string,
+    method: string,
+    path: any,
+    status: number = 0,
+    elapsed: any = undefined,
 ) {
-  const out =
-    prefix === '<--' /* Incoming */
-      ? `  ${prefix} ${method} ${path}`
-      : `  ${prefix} ${method} ${path} ${status} ${elapsed}ms`;
-  fn(out);
+    const out =
+        prefix === '<--' /* Incoming */
+            ? `  ${prefix} ${method} ${path}`
+            : `  ${prefix} ${method} ${path} ${status} ${elapsed}ms`;
+    fn(out);
 }
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
-  constructor(private readonly logger: Logger) {}
-  /**
-   * Intercepts the incoming request and logs the method and URL.
-   *
-   * @param {ExecutionContext} context - The execution context of the request.
-   * @param {CallHandler} next - The next call handler in the chain.
-   * @return {Observable<any>} An observable that represents the result of the intercepted request.
-   */
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const incoming = context.getArgByIndex(0);
-    const method: string = incoming.method;
-    const url: string = incoming.url;
-    log(this.logger.info, '<--', method, url);
+    constructor(private readonly logger: Logger) {}
+    /**
+     * Intercepts the incoming request and logs the method and URL.
+     *
+     * @param {ExecutionContext} context - The execution context of the request.
+     * @param {CallHandler} next - The next call handler in the chain.
+     * @return {Observable<any>} An observable that represents the result of the intercepted request.
+     */
+    intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+        const incoming = context.getArgByIndex(0);
+        const method: string = incoming.method;
+        const url: string = incoming.url;
+        log(this.logger.info, '<--', method, url);
 
-    const start = Date.now();
-    return next.handle().pipe(
-      tap(() => {
-        const res = context.getArgByIndex(1);
-        log(
-          this.logger.info,
-          '-->',
-          method,
-          url,
-          res.statusCode,
-          Date.now() - start,
+        const start = Date.now();
+        return next.handle().pipe(
+            tap(() => {
+                const res = context.getArgByIndex(1);
+                log(
+                    this.logger.info,
+                    '-->',
+                    method,
+                    url,
+                    res.statusCode,
+                    Date.now() - start,
+                );
+            }),
+            catchError((err) => {
+                this.logger.error(`--> Error: [${method}] ${url}`, err);
+                throw err;
+            }),
         );
-      }),
-      catchError((err) => {
-        this.logger.error(`--> Error: [${method}] ${url}`, err);
-        throw err;
-      }),
-    );
-  }
+    }
 }
