@@ -2,7 +2,6 @@ import 'dotenv/config';
 import * as fs from 'fs';
 import * as path from 'path';
 import { NestFactory } from '@nestjs/core';
-import * as compression from 'compression';
 import { NestApplicationOptions, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -31,14 +30,6 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe());
     app.useLogger(loggerService);
     app.useGlobalInterceptors(new LoggingInterceptor(logger));
-    app.use(
-        compression({
-            filter: () => {
-                return true; // always compress
-            },
-            threshold: -1, // default
-        }),
-    );
     const configService = app.get(ConfigService);
     const port = configService.get<number>('PORT');
     if (dev) {
@@ -56,3 +47,4 @@ async function bootstrap() {
     }
 }
 bootstrap();
+
