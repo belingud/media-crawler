@@ -30,7 +30,7 @@ export class ApiService {
         private readonly http: HttpService,
         private readonly logger: Logger,
         private readonly tiktok: TikTokCrawler,
-        private readonly douyin: DouYinCrawler,
+        private readonly douyin: DouYinCrawler
     ) { }
 
     #headers: object = {
@@ -86,6 +86,23 @@ export class ApiService {
         150: 'image',
     };
 
+    #awemeType = {
+        [Platform.douyin]: {
+            0: 'image',
+            2: 'image',
+            4: 'video',
+            68: 'image',
+        },
+        [Platform.tiktok]: {
+            0: 'video',
+            51: 'video',
+            55: 'video',
+            58: 'video',
+            61: 'video',
+            150: 'image',
+        }
+    };
+
     /**
      * Asynchronously parses a URL and returns an object containing data about the media.
      *
@@ -116,10 +133,10 @@ export class ApiService {
                 return awemeData;
         }
         this.logger.log(
-            `Get ${platform} video data success, judge media type...`,
+            `Get ${platform} video data success, judge media type...`
         );
         const awemeTypeCode = awemeData['aweme_type'];
-        const awemeType = this.#awemeTypeMap[awemeTypeCode];
+        const awemeType = this.#awemeType[platform][awemeTypeCode];
         this.logger.log(`Get ${platform} video type: ${awemeType}`);
         this.logger.log(`Start to format data...`);
         let officialUrl = this.getOfficialAPIUrl(platform, awemeID);
@@ -157,7 +174,7 @@ export class ApiService {
                         let wm_video_url_HQ = `https://aweme.snssdk.com/aweme/v1/playwm/?video_id=${uri}&radio=1080p&line=0`;
                         let nwm_video_url = wm_video_url.replace(
                             'playwm',
-                            'play',
+                            'play'
                         );
                         let nwm_video_url_HQ = `https://aweme.snssdk.com/aweme/v1/play/?video_id=${uri}&ratio=1080p&line=0`;
                         apiData = {
@@ -176,13 +193,13 @@ export class ApiService {
                         let noWatermarkImageList: string[] = [];
                         // 有水印图片列表/With watermark image list
                         let watermarkImageList: string[] = [];
-                        const imageList = awemeData?.image_list;
+                        const imageList = awemeData?.images;
                         // 遍历图片列表/Traverse image list
                         if (imageList && imageList.length > 0) {
                             for (const i of imageList) {
                                 noWatermarkImageList.push(i['url_list'][0]);
                                 watermarkImageList.push(
-                                    i['download_url_list'][0],
+                                    i['download_url_list'][0]
                                 );
                             }
                         }
@@ -231,10 +248,10 @@ export class ApiService {
                                 'images'
                             ]) {
                                 noWatermarkImageList.push(
-                                    i['display_image']['url_list'][0],
+                                    i['display_image']['url_list'][0]
                                 );
                                 watermarkImageList.push(
-                                    i['owner_watermark_image']['url_list'][0],
+                                    i['owner_watermark_image']['url_list'][0]
                                 );
                             }
                         }
@@ -310,7 +327,7 @@ export class ApiService {
         let withParams: string = domain + endpoint + '?' + queryString;
         const xb = generateXBogus(
             queryString,
-            this.#douyinHeaders['User-Agent'],
+            this.#douyinHeaders['User-Agent']
         );
         // const xb = new XBogus(this.#headers['User-Agent']).sign(queryString)[1];
         let targetUrl: string = withParams + `&X-Bogus=${xb}`;
@@ -319,9 +336,7 @@ export class ApiService {
             headers: this.#douyinHeaders,
         };
         let data = await lastValueFrom(
-            this.http
-                .get(targetUrl, requestConfig)
-                .pipe(map((res) => res.data)),
+            this.http.get(targetUrl, requestConfig).pipe(map((res) => res.data))
         );
         return data['aweme_detail'];
     }
@@ -390,13 +405,13 @@ export class ApiService {
             if (url.includes('v.douyin')) {
                 url = url.match(/(https:\/\/v.douyin.com\/)\w+/i)[0];
                 this.logger.log(
-                    `Get orginal url by ${Platform.douyin} share url...`,
+                    `Get orginal url by ${Platform.douyin} share url...`
                 );
                 await firstValueFrom(
                     this.http.get(url, {
                         headers: this.#headers,
                         maxRedirects: 0,
-                    }),
+                    })
                 ).catch((err) => {
                     if (err.response.status === 302) {
                         url = err.response.headers.location.split('?')[0];
