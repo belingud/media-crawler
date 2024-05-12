@@ -135,8 +135,8 @@ export class ApiService {
         this.logger.log(
             `Get ${platform} video data success, judge media type...`
         );
-        const awemeTypeCode = awemeData['aweme_type'];
-        const awemeType = this.#awemeType[platform][awemeTypeCode];
+        // 通过媒体时长来判断类型，duration为0表示图片
+        const awemeType = awemeData['duration'] ? 'video' : 'image';
         this.logger.log(`Get ${platform} video type: ${awemeType}`);
         this.logger.log(`Start to format data...`);
         let officialUrl = this.getOfficialAPIUrl(platform, awemeID);
