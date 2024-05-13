@@ -19,14 +19,23 @@ async function bootstrap() {
         console.log(__dirname);
         options.httpsOptions = {
             key: fs.readFileSync(
-                path.join(__dirname, '../../' + process.env.HTTPS_KEY),
+                path.join(__dirname, '../../' + process.env.HTTPS_KEY)
             ),
             cert: fs.readFileSync(
-                path.join(__dirname, '../../' + process.env.HTTPS_CERT),
+                path.join(__dirname, '../../' + process.env.HTTPS_CERT)
             ),
         };
     }
     const app = await NestFactory.create(AppModule, options);
+    app.enableCors({
+        origin: '*',
+        methods: '*',
+        credentials: true,
+        allowedHeaders: '*',
+        maxAge: 3600,
+        preflightContinue: true,
+        optionsSuccessStatus: 200,
+    });
     app.useGlobalPipes(new ValidationPipe());
     app.useLogger(loggerService);
     app.useGlobalInterceptors(new LoggingInterceptor(logger));
@@ -42,9 +51,8 @@ async function bootstrap() {
             configService.get<number>('HTTPS_PORT') || 8000;
         await app.listen(httpsPort);
         logger.info(
-            `HTTPS application is running on port: ${await app.getUrl()}`,
+            `HTTPS application is running on port: ${await app.getUrl()}`
         );
     }
 }
 bootstrap();
-
