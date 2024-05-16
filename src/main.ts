@@ -41,18 +41,7 @@ async function bootstrap() {
     app.useGlobalInterceptors(new LoggingInterceptor(logger));
     const configService = app.get(ConfigService);
     const port = configService.get<number>('PORT');
-    if (dev) {
-        // Use http in development env
-        await app.listen(port || 3000);
-        logger.info(`HTTP application is running on: ${await app.getUrl()}`);
-    } else {
-        // Use https in production env
-        const httpsPort: number =
-            configService.get<number>('HTTPS_PORT') || 8000;
-        await app.listen(httpsPort);
-        logger.info(
-            `HTTPS application is running on port: ${await app.getUrl()}`
-        );
-    }
+    await app.listen(port || 3000);
+    logger.info(`HTTP application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
