@@ -102,7 +102,7 @@ export const MACDouYinParams = {
 export async function getDouyinDetailParams(
     type: string,
     awemeID: string,
-): Promise<object> {
+): Promise<{ [key: string]: string | number | boolean } | null> {
     switch (type) {
     case 'old':
             return Object.assign({ aweme_id: awemeID }, oldDouyinParams);
@@ -111,4 +111,5 @@ export async function getDouyinDetailParams(
         n['msToken'] = await genMSToken();
             return n;
     }
+    return null;
 }

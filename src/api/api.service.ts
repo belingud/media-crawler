@@ -1,5 +1,10 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+    HttpException,
+    HttpStatus,
+    Injectable,
+    Logger,
+} from '@nestjs/common';
 import { firstValueFrom, lastValueFrom, map } from 'rxjs';
 import { AxiosRequestConfig } from 'axios';
 import { findUrl, genParams, generateXBogus } from '../pkg/util';
@@ -9,6 +14,7 @@ import { DouYinCookies, TikTokApiUrl, UserAgent } from '../api.config';
 import { getDouyinDetailParams } from './params';
 import { TikTokCrawler } from './crawler/tiktok.crawler';
 import { DouYinCrawler } from './crawler/douyin.crawler';
+import { AwemeData as DouyinAwemeData, Images } from './interfaces/douyin/douyin.interface';
 // import { BilibiliCrawler } from './crawler/bilibili.crawler';
 
 /**Supported platform */
@@ -31,7 +37,7 @@ export class ApiService {
         private readonly logger: Logger,
         private readonly tiktok: TikTokCrawler,
         private readonly douyin: DouYinCrawler
-    ) { }
+    ) {}
 
     #headers: object = {
         'User-Agent': UserAgent,
@@ -100,7 +106,7 @@ export class ApiService {
             58: 'video',
             61: 'video',
             150: 'image',
-        }
+        },
     };
 
     /**
@@ -113,16 +119,25 @@ export class ApiService {
     async hybridParsing(url: string): Promise<object> {
         const platform: string = this.judgePlatform(url);
         if (!platform) {
-            throw new Error('Unsupported platform');
+            throw new HttpException(
+                'Unsupported platform',
+                HttpStatus.BAD_REQUEST
+            );
         }
         this.logger.log(`Start to parse ${platform} url: ${url}`);
         const awemeID = await this.getAwemeID(url, platform);
         if (!awemeID) {
-            throw new Error(`Get ${platform} media id Failed`);
+            throw new HttpException(
+                `Get ${platform} media id Failed`,
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
         const awemeData = await this.getAwemeData(awemeID, platform);
         if (!awemeData) {
-            throw new Error(`Get ${platform} video data Failed`);
+            throw new HttpException(
+                `Get ${platform} video data Failed`,
+                HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
         switch (platform) {
             case Platform.bilibili:
@@ -160,7 +175,7 @@ export class ApiService {
             hashtags: awemeData['text_extra'],
         };
 
-        let apiData: any = {};
+        let apiData: object = {};
         // Platform switch, support douyin, tiktok
         switch (platform) {
             case Platform.douyin:
@@ -193,7 +208,7 @@ export class ApiService {
                         let noWatermarkImageList: string[] = [];
                         // 有水印图片列表/With watermark image list
                         let watermarkImageList: string[] = [];
-                        const imageList = awemeData?.images;
+                        const imageList: Images[] = awemeData?.images;
                         // 遍历图片列表/Traverse image list
                         if (imageList && imageList.length > 0) {
                             for (const i of imageList) {
@@ -225,11 +240,11 @@ export class ApiService {
                                 wm_video_url_HQ: wmVideo,
                                 nwm_video_url:
                                     awemeData['video']['play_addr'][
-                                    'url_list'
+                                        'url_list'
                                     ][0],
                                 nwm_video_url_HQ:
                                     awemeData['video']['bit_rate'][0][
-                                    'play_addr'
+                                        'play_addr'
                                     ]['url_list'][0],
                             },
                         };
@@ -287,7 +302,7 @@ export class ApiService {
      * @returns {string}
      */
     judgePlatform(url: string): string {
-        let platform: string;
+        let platform: string = '';
         if (url.includes(Platform.douyin)) {
             platform = Platform.douyin;
         } else if (url.includes(Platform.bilibili)) {
@@ -302,25 +317,29 @@ export class ApiService {
         return platform;
     }
 
-    async getAwemeData(mediaID: string, platform: string) {
+    async getAwemeData(mediaID: string, platform: string): Promise<any> {
         switch (platform) {
             case Platform.douyin:
                 return await this.getDouYinAwemeData(mediaID);
             case Platform.tiktok:
                 return await this.tiktok.getAwemeData(mediaID);
         }
+        return null;
     }
 
     /**
      * Retrieves DouYin video data based on the provided awemeID.
      *
      * @param {string} awemeID - The unique identifier for the DouYin video.
-     * @return {Promise<any>} The data object containing the details of the aweme.
+     * @return {Promise<object | null>} The data object containing the details of the aweme.
      */
-    async getDouYinAwemeData(awemeID: string) {
+    async getDouYinAwemeData(awemeID: string): Promise<DouyinAwemeData | null> {
         const domain: string = 'https://www.douyin.com';
         const endpoint: string = '/aweme/v1/web/aweme/detail/';
         let queryParams = await getDouyinDetailParams('old', awemeID);
+        if (!queryParams) {
+            return null;
+        }
         queryParams['aweme_id'] = awemeID;
 
         const queryString: string = genParams(queryParams);
@@ -347,7 +366,7 @@ export class ApiService {
      * @param platform Url platform
      * @returns mediaID
      */
-    async getAwemeID(text: string, platform: string): Promise<string> {
+    async getAwemeID(text: string, platform: string): Promise<string | null> {
         switch (platform) {
             case Platform.douyin:
                 return await this.getDouYinAwemeID(text);
@@ -384,22 +403,27 @@ export class ApiService {
         /**Get douyin media id from url*/
         let url = await this.convertShareUrl(text);
         let mediaID: string;
+        let match: object | null = null;
         if (url.includes('/video/')) {
-            mediaID = url.match(/\/video\/(\d+)/i)[1];
+            match = url.match(/\/video\/(\d+)/i);
         } else if (url.includes('discover?')) {
-            mediaID = url.match(/modal_id=(\d+)/i)[1];
+            match = url.match(/modal_id=(\d+)/i);
         } else if (url.includes('live.douyin')) {
             url = url.split('?')[0];
-            mediaID = url.replace('https://live.douyin.com/', '');
+            match = [null, url.replace('https://live.douyin.com/', '')];
         } else if (url.includes('note')) {
-            mediaID = url.match(/\/note\/(\d+)/i)[1];
+            match = url.match(/\/note\/(\d+)/i);
         }
+        mediaID = match ? match[1] : ''
         this.logger.log(`Get media id: ${mediaID}`);
         return mediaID;
     }
 
     async convertShareUrl(text: string): Promise<string> {
         let url: string = findUrl(text);
+        if (!url) {
+            throw new HttpException('Invalid url', HttpStatus.BAD_REQUEST);
+        }
         if (url.includes(Platform.douyin)) {
             /**Get douyin original url, except receive 302 response, get url from header */
             if (url.includes('v.douyin')) {
@@ -435,7 +459,7 @@ export class ApiService {
      */
     async getTikTokAwemeID(text: string): Promise<string> {
         let url = await this.convertShareUrl(text);
-        let awemeID: string;
+        let awemeID: string = '';
         if (url.includes('/video/')) {
             awemeID = url.match(/\/video\/(\d+)/i)[1];
         } else if (url.includes('/v/')) {

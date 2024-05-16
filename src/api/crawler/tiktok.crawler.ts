@@ -1,7 +1,7 @@
 import { AxiosProxyConfig, AxiosRequestConfig } from 'axios';
 import { BaseCrawler } from './base.crawler';
 import { lastValueFrom, map } from 'rxjs';
-import { TikTokApiUrl } from 'src/api.config';
+import { TikTokApiUrl } from '../../api.config';
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';

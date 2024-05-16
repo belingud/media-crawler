@@ -13,7 +13,7 @@ import {
 import { ApiService } from './api.service';
 import { Response } from 'express';
 import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
-import { genMD5Hash } from 'src/pkg/util';
+import { genMD5Hash } from '../pkg/util';
 
 @Controller('/')
 export class ApiController {
