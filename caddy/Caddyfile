@@ -1,0 +1,11 @@
+(logging) {
+	log {
+		output file /data/log/caddy.log
+		format json
+	}
+}
+
+https://toolkit.lte.ink {
+    import logging
+    reverse_proxy host.docker.internal:3000
+}
