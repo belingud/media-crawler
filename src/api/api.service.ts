@@ -129,14 +129,14 @@ export class ApiService {
         if (!awemeID) {
             throw new HttpException(
                 `Get ${platform} media id Failed`,
-                HttpStatus.INTERNAL_SERVER_ERROR
+                HttpStatus.BAD_REQUEST
             );
         }
         const awemeData = await this.getAwemeData(awemeID, platform);
         if (!awemeData) {
             throw new HttpException(
                 `Get ${platform} video data Failed`,
-                HttpStatus.INTERNAL_SERVER_ERROR
+                HttpStatus.BAD_REQUEST
             );
         }
         switch (platform) {
