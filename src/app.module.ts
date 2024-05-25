@@ -6,7 +6,8 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { ApiModule } from './api/api.module';
 import { configuration } from './config/configuration';
 import { throttlerOptions } from './options/throttler.options';
-import { cacheOptions } from './options/cache.options';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { QueryCacheInterceptor } from './interceptors/query-cache.interceptor';
 
 @Module({
     imports: [
@@ -21,12 +22,17 @@ import { cacheOptions } from './options/cache.options';
             useFactory: async (configService: ConfigService) => {
                 return {
                     isGlobal: true,
-                    ...cacheOptions,
                     ...configService.get('REDIS'),
                 };
             },
         }),
     ],
-    providers: [Logger],
+    providers: [
+        Logger,
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: QueryCacheInterceptor,
+        },
+    ],
 })
 export class AppModule {}

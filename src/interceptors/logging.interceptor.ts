@@ -4,7 +4,7 @@ import {
     Injectable,
     NestInterceptor,
 } from '@nestjs/common';
-import { catchError, Observable, tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { Logger } from 'winston';
 
 // const logger: Logger = new Logger('LogInterceptor', loggerOptions);
@@ -62,10 +62,6 @@ export class LoggingInterceptor implements NestInterceptor {
                     res.statusCode,
                     Date.now() - start,
                 );
-            }),
-            catchError((err) => {
-                this.logger.error(`--> Error: [${method}] ${url}`, err.message);
-                throw err;
             }),
         );
     }

@@ -26,7 +26,6 @@ describe('ApiService', () => {
                     useFactory: async (configService: ConfigService) => {
                         return {
                             isGlobal: true,
-                            ...cacheOptions,
                             ...configService.get('REDIS'),
                         };
                     },

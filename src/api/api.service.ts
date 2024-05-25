@@ -132,7 +132,7 @@ export class ApiService {
                 HttpStatus.BAD_REQUEST
             );
         }
-        const awemeData = await this.getAwemeData(awemeID, platform);
+        const awemeData = await this.getAwemeData(awemeID, platform, url);
         if (!awemeData) {
             throw new HttpException(
                 `Get ${platform} video data Failed`,
@@ -146,6 +146,9 @@ export class ApiService {
                 return awemeData;
             case Platform.kuaishou:
                 return awemeData;
+            case Platform.tiktok:
+                this.logger.log('Start to format TikTok data...');
+                return this.tiktok.formatData(awemeData);
         }
         this.logger.log(
             `Get ${platform} video data success, judge media type...`
@@ -317,12 +320,12 @@ export class ApiService {
         return platform;
     }
 
-    async getAwemeData(mediaID: string, platform: string): Promise<any> {
+    async getAwemeData(mediaID: string, platform: string, url: string): Promise<any> {
         switch (platform) {
             case Platform.douyin:
                 return await this.getDouYinAwemeData(mediaID);
             case Platform.tiktok:
-                return await this.tiktok.getAwemeData(mediaID);
+                return await this.tiktok.getAwemeData(mediaID, url);
         }
         return null;
     }

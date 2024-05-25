@@ -6,8 +6,9 @@ import { NestApplicationOptions, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { AppModule } from './app.module';
-import { LoggingInterceptor } from './logging.interceptor';
+import { LoggingInterceptor } from './interceptors/logging.interceptor';
 import { logger, loggerService } from './logger';
+import { HttpExceptionFilter } from './app.filter';
 
 const dev = process.env.NODE_ENV !== 'production';
 
@@ -39,6 +40,7 @@ async function bootstrap() {
     app.useGlobalPipes(new ValidationPipe());
     app.useLogger(loggerService);
     app.useGlobalInterceptors(new LoggingInterceptor(logger));
+    app.useGlobalFilters(new HttpExceptionFilter(logger));
     const configService = app.get(ConfigService);
     const port = configService.get<number>('PORT');
     await app.listen(port || 3000);
