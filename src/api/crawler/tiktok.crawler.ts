@@ -187,25 +187,3 @@ export class TikTokCrawler extends BaseCrawler {
         return data;
     }
 }
-// headers:{'User-Agent': 'Mozilla/5.0', 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'Accept-Language': 'en-us,en;q=0.5', 'Sec-Fetch-Mode': 'navigate', 'Accept-Encoding': 'gzip, deflate, br'}
-// download headers: {'Accept-Encoding': 'identity', 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36', 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'Accept-Language': 'en-us,en;q=0.5', 'Sec-Fetch-Mode': 'navigate', 'Referer': 'https://www.tiktok.com/@aze.sg/video/7346559915361635586'}
-// video httpie:
-
-// https GET https://v16-webapp-prime.us.tiktok.com/video/tos/alisg/tos-alisg-pve-0037c001/owlfQ0sEADEHvgUPOOFBfFZvjBQOpI8SRD9Isg/?a=1988&bti=ODszNWYuMDE6&ch=0&cr=3&dr=0&lr=unwatermarked&cd=0%7C0%7C0%7C&cv=1&br=1692&bt=846&cs=0&ds=6&ft=4KJMyMzm8Zmo0SNcq-4jVJAZdpWrKsd.&mime_type=video_mp4&qs=0&rc=ZDs8Njk6aDM4NWVmZGZpNkBpanBrcXE5cnQ2cTMzODczNEBgYjRfLS5eXzMxL2FeXmMwYSMwY2RoMmRjZW5gLS1kMS1zcw%3D%3D&btag=e00090000&expire=1716648270&l=2024052508431608FEA8992E299C17CF47&ply_type=2&policy=2&signature=dd0aa2e3970d66ff74c40f70b3f10fbf&tk=tt_chain_token \
-// 'Host:v16-webapp-prime.us.tiktok.com' \
-// 'Connection:keep-alive' \
-// 'sec-ch-ua:"Microsoft Edge";v="123", "Not:A-Brand";v="8", "Chromium";v="123"' \
-// 'DNT:1' \
-// 'Accept-Encoding:identity;q=1, *;q=0' \
-// 'sec-ch-ua-mobile:?0' \
-// 'User-Agent:Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.0.0' \
-// 'sec-ch-ua-platform:"macOS"' \
-// 'Accept:*/*' \
-// 'Sec-Fetch-Site:same-site' \
-// 'Sec-Fetch-Mode:no-cors' \
-// 'Sec-Fetch-Dest:video' \
-// 'Referer:https://www.tiktok.com/' \
-// 'Accept-Language:zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6' \
-// 'Cookie:tt_csrf_token=ggvXO3hm-1QXfUGuWhec5X8VA01LhR89e-EE; tt_chain_token=3khp3OaAmUxpy8qf9BA41Q==; odin_tt=cfcfed4a017dce8904d75a0cba87b505f675726c89deab21441e790efdd42ca58f4b2bef8a3acb1a908bc75505dee4027782e2bb4c78cf8f7c319fe17b8f530ed4e72c33c0542eca003e76387c0d33a8; passport_csrf_token=34d9d023fe593a91d280b378e31394fa; passport_csrf_token_default=34d9d023fe593a91d280b378e31394fa; s_v_web_id=verify_lwj9uddx_8l0jUjjo_6R8o_4qr7_BPiE_DFPz6NnxJnQK; d_ticket=e6c722d81fa24225d8adbae3b68c9d74f21e8; multi_sids=7337269478160892974%3Af21001836c202ed54bb5654bd5d8c460; cmpl_token=AgQQAPNSF-RO0rXt2RDLKl0X_C7ZdUnWv5I3YNcdow; uid_tt=ff0ed33dadccd17b78cbdbdc73985037d8bd8befe459a2ca9b79cb7b297e4e4d; uid_tt_ss=ff0ed33dadccd17b78cbdbdc73985037d8bd8befe459a2ca9b79cb7b297e4e4d; sid_tt=f21001836c202ed54bb5654bd5d8c460; sessionid=f21001836c202ed54bb5654bd5d8c460; sessionid_ss=f21001836c202ed54bb5654bd5d8c460; store-idc=useast5; store-country-code=us; store-country-code-src=uid; tt-target-idc=useast5; tt-target-idc-sign=S5akfMpSurQN7Rn-9aj_JCk-eErtqGBkahFuFq25Cu5N560lCWfAsQRftuoxeSy6y847qCzvpoNXe7VaT-CC51cTBYJAyC73Q2DUA67tD0EOQbe9ZG5vBbAl74KantFex9TVrGJ-sEPVZTkN2S7p6QKCUetQ7wrvIdwXZF3PrQ5wKFghNZNyxp55f89S39041PuJSBlUn2uylux8PM-Ms7bwBKz2C3MLl8S49iMs-3FAwMurTIy8yuHbCZP3cPKnARVvS2PAjJbCRnE6VCQNIt0FaDZF9QI1ryBC1v7vjwnw1E-ylH1EvJGUuDYhpWQQJDgA_4bly5OSUBU2Wbe7Ozf7DuLY3TtsJB9o_GPsPgg5NJ5UJrU_Ag5HF5AIoYgqNZwG4atU6S3dFKydHH0wl66Jcff0d4Vh1NksYmNSvHfYvCvzWhyQpWjgSteirPe2SDJ3CIbs9SZil-FjzNQsV91jRbjOF9gdSLjJGdBRWTeTOa_npI9sIiPNBc5fgcJo; sid_guard=f21001836c202ed54bb5654bd5d8c460%7C1716469913%7C15551992%7CTue%2C+19-Nov-2024+13%3A11%3A45+GMT; sid_ucp_v1=1.0.0-KGY0NGNlODFjYzRhMzk1MDUzMzAzOTY3ZDgxYWMxNjA1ZWYwMTk3NmIKGAiuiOKY9PbN6WUQmYG9sgYYsws4AUDqBxAEGgd1c2Vhc3Q1IiBmMjEwMDE4MzZjMjAyZWQ1NGJiNTY1NGJkNWQ4YzQ2MA; ssid_ucp_v1=1.0.0-KGY0NGNlODFjYzRhMzk1MDUzMzAzOTY3ZDgxYWMxNjA1ZWYwMTk3NmIKGAiuiOKY9PbN6WUQmYG9sgYYsws4AUDqBxAEGgd1c2Vhc3Q1IiBmMjEwMDE4MzZjMjAyZWQ1NGJiNTY1NGJkNWQ4YzQ2MA; ak_bmsc=B1A05A1ED04948B4564BCF3838058750~000000000000000000000000000000~YAAQDPN0aBGl562PAQAAE4/nrhf1YUvZQOgYJYaylFPqSD1heEttvX0a/uzS79PDgz3pERkZDRtLzo2NTyY4v4pQ0CQ06g4bREGM+PPWe/J1bwiH0A7Wb6RpXnJshi4v+tI6EyWJN/rQ82mzbkEjWFYGrQ2hRJwsv6r1bTjZC4qGpRpQvIN3CTaBIk3lb5PEQYAUHu4LC7R7eNFsL9L4Y8JKiTCntSoBtsP9BetfyKTB6jy8cwCHM4C1PJWTsTUzBuZ2Dqg2GYXLMMQx5wU4hpq7ees4dU4MCcHVl/q3FFVOy/aPxdKop7MgsH13UYaufg5lki5EkMEfOelTnhNyzf/2cvlT9bz3fM4Hd9XHwT665t4DUq2yof/54vc=; msToken=AN-lLdatB9aSprp611s3IRUtQ0b086MDrKv7D4kN8NTjmOunaTvfOPu-UwGUMQKa5h7zxc8pnSgx6zjq1deeSX1yHf_prp3CSm7keoqYWrg5K2j2T9Mp7rkJjdA9L5diPLU_tWGOdath; bm_sv=2DBF7C271F444B3B6087923F338580CC~YAAQDfN0aP61yqqPAQAARSLrrhdxGufa6CJ/uOtF/9RBXDte3dwrwHJ3wRbLVMt9Gr1lrrXa0SgZGMROC5t1sKQBGBsX1W5OGqp24/3PTMrKPbj4Kp/tEvmB5aBES/MFYFCF8XJ77NRaBWDmIooRDl4pe4pRxt3Eb79J6TbIu6QgUEqfygHy/4U8dMmIHqRU0NJ8pbT1ArKqYPJwqtt3//4c70VfoJ46p0N5/X6h7XWFPb2lJs3vqJkqrOvVW1n4~1; ttwid=1%7CkjcSfrZRkWUtJwpq1spCK9RhklVqborta_0Jhq0zYsY%7C1716626598%7C9a7b8601c60d1c206c2e5098dc4f4138effd991f7a4f7bddb973fab8fe56e4d0' \
-// 'Range:bytes=0-' \
-// --verify=no --proxy=http:http://localhost:7890 --proxy=https:http://localhost:7890
