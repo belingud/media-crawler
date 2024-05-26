@@ -6,6 +6,8 @@ import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { CONFIGURATION_SERVICE_TOKEN } from '@nestjs/config/dist/config.constants';
+import { PlaywrightService } from 'src/playwright/playwright.service';
+import { GeoCodeEnum } from 'src/playwright/playwright.enum';
 
 const logger: Logger = new Logger('TikTokCrawler');
 
@@ -15,7 +17,8 @@ export class TikTokCrawler extends BaseCrawler {
         protected readonly http: HttpService,
 
         @Inject(CONFIGURATION_SERVICE_TOKEN)
-        protected readonly config: ConfigService
+        protected readonly config: ConfigService,
+        protected readonly playwright: PlaywrightService
     ) {
         super(http);
     }
@@ -73,6 +76,7 @@ export class TikTokCrawler extends BaseCrawler {
     }
     async getAwemeID(text: string): Promise<string> {
         let url = await this.convertShareUrl(text);
+        return url;
         let awemeID: string;
         if (url.includes('/video/')) {
             awemeID = url.match(/\/video\/(\d+)/i)[1];
@@ -100,36 +104,15 @@ export class TikTokCrawler extends BaseCrawler {
         // const paramsString: string = new URLSearchParams(
         //     queryParams
         // ).toString();
-        let preRequest: any = await firstValueFrom(
-            this.http.get('https://www.tiktok.com/', {
-                proxy: this.config.get<AxiosProxyConfig>(
-                    'DEFAULT_PROXY_CONFIG'
-                ),
-                headers: { 'User-Agent': UserAgent },
-            })
-        ).catch((error) => {
-            logger.error(error);
+        const content = await this.playwright.getContent({
+            url: url,
+            proxy: this.config.get<string>('PROXY_STRING'),
+            geolocation: GeoCodeEnum.Singapore
         });
-        let headers: object = preRequest.headers || { 'set-cookie': [] };
-        let cookies: string = headers['set-cookie'].join('; ');
-        cookies = cookies.trim();
-        let _headers = Object.assign({ Cookie: cookies }, this.#tiktokHeaders);
-        const axiosConfig: AxiosRequestConfig = {
-            headers: _headers,
-            proxy: this.config.get<AxiosProxyConfig>('DEFAULT_PROXY_CONFIG'),
-        };
-        const detailUrl = `${url}`;
-        console.debug('detailUrl : ', detailUrl);
-        let data = await lastValueFrom(
-            this.http.get(detailUrl, axiosConfig).pipe(map((res) => res.data))
-        ).catch((error) => {
-            logger.log(error);
-            throw new NotFoundException('Media not found');
-        });
-        if (!data) {
+        if (!content) {
             throw new NotFoundException('Media not found');
         }
-        const match: RegExpMatchArray = this.#videoInfoPattern.exec(data);
+        const match: RegExpMatchArray = this.#videoInfoPattern.exec(content);
         if (!match) {
             throw new NotFoundException('Media not found');
         }

@@ -8,6 +8,7 @@ import { configuration } from './config/configuration';
 import { throttlerOptions } from './options/throttler.options';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { QueryCacheInterceptor } from './interceptors/query-cache.interceptor';
+import { PlaywrightService } from './playwright/playwright.service';
 
 @Module({
     imports: [
@@ -33,6 +34,7 @@ import { QueryCacheInterceptor } from './interceptors/query-cache.interceptor';
             provide: APP_INTERCEPTOR,
             useClass: QueryCacheInterceptor,
         },
+        PlaywrightService,
     ],
 })
 export class AppModule {}

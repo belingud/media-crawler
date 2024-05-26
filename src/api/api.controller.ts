@@ -22,7 +22,7 @@ export class ApiController {
     ) {}
 
     @Get('/hyperparse')
-    @QueryCache()
+    // @QueryCache()
     async getInfo(
         @Query('url') url: string,
         @Query('minimal', new DefaultValuePipe(true), ParseBoolPipe) minimal: boolean = false,

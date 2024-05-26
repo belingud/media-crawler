@@ -77,6 +77,7 @@ export const configuration: ConfigFactory<AppConfig> = () => {
         },
         REDIS: redisConfig,
         DEFAULT_PROXY_CONFIG: defaultProxy,
+        PROXY_STRING: envProxyConfig
     };
 };
 
