@@ -1,8 +1,8 @@
 import { DouYinCookies, UserAgent } from '../../api.config';
 import { BaseCrawler } from './base.crawler';
-import { sign } from '../../pkg/X-Bogus';
+import { sign } from '../../common/X-Bogus';
 import { getDouyinDetailParams } from '../params';
-import { genParams } from '../../pkg/util';
+import { genParams } from '../../common/util';
 import { AxiosRequestConfig } from 'axios';
 import { lastValueFrom, map } from 'rxjs';
 

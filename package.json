@@ -17,7 +17,8 @@
         "test:watch": "jest --watch",
         "test:cov": "jest --coverage",
         "test:debug": "jest --debug",
-        "test:e2e": "jest --config ./test/jest-e2e.json"
+        "test:e2e": "jest --config ./test/jest-e2e.json",
+        "ts": "ts-node"
     },
     "engines": {
         "node": ">18"
@@ -33,17 +34,22 @@
         "axios": "^1.7.2",
         "cache-manager": "^5.5.3",
         "cache-manager-ioredis-yet": "^2.0.4",
+        "chrono-node": "^2.7.5",
         "class-transformer": "^0.5.1",
         "class-validator": "^0.14.1",
         "dotenv": "^16.4.5",
         "esbuild": "^0.21.4",
+        "https-proxy-agent": "^7.0.4",
         "ioredis": "^5.4.1",
         "js-yaml": "^4.1.0",
         "md5": "^2.3.0",
         "nest-winston": "^1.10.0",
+        "node-fetch": "2.7",
         "playwright": "^1.44.1",
+        "radash": "^12.1.0",
         "reflect-metadata": "^0.2.2",
         "rxjs": "^7.8.1",
+        "twitter-openapi-typescript-generated": "^0.0.21",
         "winston": "^3.13.0"
     },
     "devDependencies": {

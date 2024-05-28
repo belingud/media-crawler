@@ -1,6 +1,7 @@
+import * as crypto from 'crypto';
+import { parseDate } from 'chrono-node';
 import { TSUnit } from './enum';
 import { sign } from './X-Bogus';
-import * as crypto from 'crypto';
 // import { sign } from './tmp-xbogus';
 /**
  * Find and return the first URL in the input text.
@@ -60,4 +61,13 @@ export function getTimeStamp(unit: TSUnit = TSUnit.milli): number {
  */
 export function genMD5Hash(str: string): string {
     return crypto.createHash('md5').update(str, 'utf8').digest('hex');
+}
+
+/**
+ * 模糊解析日期字符串，返回毫秒时间戳
+ * @param datetimeStr 日期字符串
+ * @returns 毫秒时间戳
+ */
+export function datetimeStr2TS(datetimeStr: string): number {
+    return parseDate(datetimeStr).getTime();
 }

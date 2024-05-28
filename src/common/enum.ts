@@ -5,6 +5,7 @@ export enum Platform {
     kuaishou = 'kuaishou',
     tiktok = 'tiktok',
     xigua = 'xigua',
+    x = 'x'
 }
 
 /**时间戳单位 */

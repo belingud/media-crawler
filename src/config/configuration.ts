@@ -7,6 +7,7 @@ import { join, dirname } from 'path';
 import { ConfigFactory } from '@nestjs/config';
 import { AxiosProxyConfig } from 'axios';
 import { redisStore } from 'cache-manager-ioredis-yet';
+import { memo } from 'radash';
 
 interface AppConfig {
     NODE_ENV: string;
@@ -26,13 +27,14 @@ interface AppConfig {
         max?: number;
     };
     DEFAULT_PROXY_CONFIG: AxiosProxyConfig | null;
+    PROXY_STRING: string;
 }
 const ROOT: string = dirname(dirname(dirname(__dirname)));
 const isDev = process.env.NODE_ENV === 'development';
 
 const proxyPattern = /^(?:http:\/\/)?(?:([^:]+):([^@]+)@)?([^:\/]+)(?::(\d+))?/;
 
-export const configuration: ConfigFactory<AppConfig> = () => {
+function _getConfigs(): AppConfig {
     const envProxyConfig: string = process.env.DEFAULT_PROXY || '';
     const match = envProxyConfig ? envProxyConfig.match(proxyPattern) : null;
     let auth: { username: string; password: string } | null = null;
@@ -53,7 +55,7 @@ export const configuration: ConfigFactory<AppConfig> = () => {
               ...auth,
           }
         : null;
-    const redisConfig: AppConfig['REDIS'] = isDev
+    const redisConfig: AppConfig['REDIS'] = false
         ? {
               store: 'memory',
               ttl: 5 * 60 * 1000, // 5 minutes
@@ -77,8 +79,14 @@ export const configuration: ConfigFactory<AppConfig> = () => {
         },
         REDIS: redisConfig,
         DEFAULT_PROXY_CONFIG: defaultProxy,
-        PROXY_STRING: envProxyConfig
+        PROXY_STRING: envProxyConfig,
     };
+}
+
+export const memoizedGetConfig = memo(_getConfigs);
+
+export const configuration: ConfigFactory<AppConfig> = () => {
+    return memoizedGetConfig();
 };
 
-export const config = configuration();
+export const config = memoizedGetConfig();

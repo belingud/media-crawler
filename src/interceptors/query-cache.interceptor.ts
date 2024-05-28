@@ -10,7 +10,7 @@ import { Reflector } from '@nestjs/core';
 import { Observable, from, of } from 'rxjs';
 import { tap, switchMap } from 'rxjs/operators';
 import { QUERY_CACHE_KEY } from 'src/decorators/query-cache.decorstor';
-import { genMD5Hash } from 'src/pkg/util';
+import { genMD5Hash } from 'src/common/util';
 
 @Injectable()
 export class QueryCacheInterceptor implements NestInterceptor {

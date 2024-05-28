@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { firstValueFrom, lastValueFrom, map } from 'rxjs';
 import { AxiosRequestConfig } from 'axios';
-import { findUrl, genParams, generateXBogus } from '../pkg/util';
+import { findUrl, genParams, generateXBogus } from '../common/util';
 import { DouYinCookies, TikTokApiUrl, UserAgent } from '../api.config';
 // import { XBogus } from '../pkg/xbogus';
 // import { genMSToken } from './tokenManager';
@@ -15,6 +15,7 @@ import { getDouyinDetailParams } from './params';
 import { TikTokCrawler } from './crawler/tiktok.crawler';
 import { DouYinCrawler } from './crawler/douyin.crawler';
 import { AwemeData as DouyinAwemeData, Images } from './interfaces/douyin/douyin.interface';
+import { XCrawler } from './crawler/x.crawler';
 // import { BilibiliCrawler } from './crawler/bilibili.crawler';
 
 /**Supported platform */
@@ -24,6 +25,7 @@ enum Platform {
     kuaishou = 'kuaishou',
     tiktok = 'tiktok',
     xigua = 'xigua',
+    x = 'x',
 }
 
 @Injectable()
@@ -36,7 +38,8 @@ export class ApiService {
         private readonly http: HttpService,
         private readonly logger: Logger,
         private readonly tiktok: TikTokCrawler,
-        private readonly douyin: DouYinCrawler
+        private readonly douyin: DouYinCrawler,
+        private readonly x: XCrawler
     ) {}
 
     #headers: object = {
@@ -117,7 +120,7 @@ export class ApiService {
      * @throws {Error} If the platform is unsupported or if getting the media ID or video data fails.
      */
     async hybridParsing(url: string): Promise<object> {
-        const platform: string = this.judgePlatform(url);
+        const platform: Platform = this.judgePlatform(url);
         if (!platform) {
             throw new HttpException(
                 'Unsupported platform',
@@ -149,6 +152,8 @@ export class ApiService {
             case Platform.tiktok:
                 this.logger.log('Start to format TikTok data...');
                 return this.tiktok.formatData(awemeData);
+            case Platform.x:
+                return this.x.formatData(awemeData);
         }
         this.logger.log(
             `Get ${platform} video data success, judge media type...`
@@ -230,57 +235,6 @@ export class ApiService {
                         break;
                 }
                 break;
-            case Platform.tiktok:
-                switch (awemeType) {
-                    // Generate tiktok video data
-                    case 'video':
-                        this.logger.log('Start to format tiktok video data');
-                        const wmVideo =
-                            awemeData['video']['download_addr']['url_list'][0];
-                        apiData = {
-                            video_data: {
-                                wm_video_url: wmVideo,
-                                wm_video_url_HQ: wmVideo,
-                                nwm_video_url:
-                                    awemeData['video']['play_addr'][
-                                        'url_list'
-                                    ][0],
-                                nwm_video_url_HQ:
-                                    awemeData['video']['bit_rate'][0][
-                                        'play_addr'
-                                    ]['url_list'][0],
-                            },
-                        };
-                        break;
-                    // Generate tiktok image data
-                    case 'image':
-                        this.logger.log('Start to format tiktok image data');
-                        // 无水印图片列表/No watermark image list
-                        let noWatermarkImageList: string[] = [];
-                        // 有水印图片列表/With watermark image list
-                        let watermarkImageList: string[] = [];
-                        const imagePostInfo = awemeData?.image_post_info;
-                        const images = imagePostInfo?.images;
-                        if (images) {
-                            for (const i of awemeData['image_post_info'][
-                                'images'
-                            ]) {
-                                noWatermarkImageList.push(
-                                    i['display_image']['url_list'][0]
-                                );
-                                watermarkImageList.push(
-                                    i['owner_watermark_image']['url_list'][0]
-                                );
-                            }
-                        }
-                        apiData = {
-                            image_data: {
-                                no_watermark_image_list: noWatermarkImageList,
-                                watermark_image_list: watermarkImageList,
-                            },
-                        };
-                        break;
-                }
         }
         Object.assign(result, apiData);
         return result;
@@ -304,8 +258,8 @@ export class ApiService {
      * @param {string} url User raw input url
      * @returns {string}
      */
-    judgePlatform(url: string): string {
-        let platform: string = '';
+    judgePlatform(url: string): Platform {
+        let platform: Platform;
         if (url.includes(Platform.douyin)) {
             platform = Platform.douyin;
         } else if (url.includes(Platform.bilibili)) {
@@ -316,6 +270,8 @@ export class ApiService {
             platform = Platform.tiktok;
         } else if (url.includes(Platform.xigua)) {
             platform = Platform.xigua;
+        } else if (url.includes('x.com') || url.includes('twitter.com')) {
+            platform = Platform.x;
         }
         return platform;
     }
@@ -326,6 +282,8 @@ export class ApiService {
                 return await this.getDouYinAwemeData(mediaID);
             case Platform.tiktok:
                 return await this.tiktok.getAwemeData(mediaID, url);
+            case Platform.x:
+                return await this.x.getAwemeData(mediaID, url);
         }
         return null;
     }
@@ -369,7 +327,7 @@ export class ApiService {
      * @param platform Url platform
      * @returns mediaID
      */
-    async getAwemeID(text: string, platform: string): Promise<string | null> {
+    async getAwemeID(text: string, platform: Platform): Promise<string | null> {
         switch (platform) {
             case Platform.douyin:
                 return await this.getDouYinAwemeID(text);
@@ -381,6 +339,8 @@ export class ApiService {
                 return await this.tiktok.getAwemeID(text);
             // case Platform.xigua:
             //   return this.getXiguaMediaID(text);
+            case Platform.x:
+                return await this.x.getAwemeID(text)
         }
         return null;
     }

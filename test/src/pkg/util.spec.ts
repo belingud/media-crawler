@@ -1,4 +1,4 @@
-import { findUrl, genMD5Hash, genParams } from '../../../src/pkg/util';
+import { findUrl, genMD5Hash, genParams } from '../../../src/common/util';
 /**
  * Unit test for {@link findUrl}.
  */
