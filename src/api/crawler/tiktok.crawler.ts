@@ -85,6 +85,46 @@ export class TikTokCrawler extends BaseCrawler {
         }
         return awemeID;
     }
+    async OLDgetAwemeData(awemeID: string, url?: string): Promise<object> {
+        const queryParams = {
+            iid: '7318518857994389254',
+            device_id: '7318517321748022790',
+            channel: 'googleplay',
+            app_name: 'musical_ly',
+            version_code: '300904',
+            device_platform: 'android',
+            device_type: 'ASUS_Z01QD',
+            os_version: '9',
+            aweme_id: awemeID,
+        };
+        const paramsString: string = new URLSearchParams(
+            queryParams,
+        ).toString();
+        const axiosConfig: AxiosRequestConfig = {
+            headers: this.#tiktokHeaders,
+        };
+        if (this.config.get('DEFAULT_PROXY')) {
+            axiosConfig['proxy'] = this.config.get<AxiosProxyConfig>(
+                'DEFAULT_PROXY_CONFIG',
+            );
+        }
+        const detailUrl = `${TikTokApiUrl}?${paramsString}`;
+        console.debug('detailUrl : ', detailUrl);
+        let data = await lastValueFrom(
+            this.http.get(detailUrl, axiosConfig).pipe(map((res) => res.data)),
+        ).catch((error) => {
+            logger.log(error);
+            throw new NotFoundException('Media not found');
+        });
+        if (!data) {
+            throw new NotFoundException('Media not found');
+        }
+        const awemeData = data['aweme_list'][0];
+        if (awemeID != awemeData['aweme_id']) {
+            throw new NotFoundException('Media not found');
+        }
+        return awemeData;
+    }
 
     async getAwemeData(awemeID: string, url: string): Promise<object> {
         if (!url.includes(awemeID)) {
