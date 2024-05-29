@@ -73,7 +73,7 @@ export class TwitterOpenApi {
             priority: 'u=1, i',
             referer: 'https://twitter.com/home',
         };
-        await this.cache.set('browser_headers', JSON.stringify(headers), 60 * 60 * 1000); // 1 hours
+        await this.cache.set('browser_headers', JSON.stringify(headers), 4 * 10 * 60 * 1000); // 4 hours
         return headers;
     }
 
@@ -211,7 +211,7 @@ export class TwitterOpenApi {
             method: 'GET',
             ...this.initOverrides,
         }).then((res) => res.json())) as DefaultFlag;
-        await this.cache.set('client-flag', flag, 60 * 60 * 1000); // 1 hours
+        await this.cache.set('client-flag', flag, 4 * 60 * 60 * 1000); // 4 hours
         return new TwitterOpenApiClient(api, flag, this.initOverrides);
     }
 }
