@@ -88,7 +88,7 @@ export class XCrawler extends BaseCrawler {
             return cookie;
         }
         value = JSON.stringify(cookie);
-        this.cache.set('X-Cookie', value, 60 * 60 * 1000); // 1 hour
+        this.cache.set('X-Cookie', value, 10 * 60 * 1000); // 10 minutes
         return cookie;
     }
 
