@@ -9,22 +9,23 @@ const logger = getLogger('playwright');
 export class PlaywrightService {
     private browser: playwright.Browser;
     private area: string = 'HK';
+    private userDataDir: string = './user-data';
 
     private readonly GeoMap: Record<string, playwright.Geolocation> = {
         [GeoCodeEnum.Singapore]: { latitude: 1.3521, longitude: 103.8198 },
     };
 
-    async getBrowser(): Promise<playwright.Browser> {
+    async getBrowser(headless: boolean = true): Promise<playwright.Browser> {
         if (!this.browser) {
-            this.browser = await this.createBrowser();
+            this.browser = await this.createBrowser(headless);
         }
         return this.browser;
     }
 
-    async createBrowser(): Promise<playwright.Browser> {
+    async createBrowser(headless: boolean = true): Promise<playwright.Browser> {
         return await playwright.chromium.launch({
             channel: 'msedge',
-            headless: true,
+            headless: headless,
             args: ['--disable-blink-features=AutomationControlled'],
         });
     }

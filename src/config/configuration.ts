@@ -55,7 +55,7 @@ function _getConfigs(): AppConfig {
               ...auth,
           }
         : null;
-    const redisConfig: AppConfig['REDIS'] = false
+    const redisConfig: AppConfig['REDIS'] = isDev
         ? {
               store: 'memory',
               ttl: 5 * 60 * 1000, // 5 minutes

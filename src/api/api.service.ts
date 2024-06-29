@@ -279,7 +279,8 @@ export class ApiService {
     async getAwemeData(mediaID: string, platform: string, url: string): Promise<any> {
         switch (platform) {
             case Platform.douyin:
-                return await this.getDouYinAwemeData(mediaID);
+                // return await this.getDouYinAwemeData(mediaID);
+                return await this.douyin.getAwemeData(mediaID, url);
             case Platform.tiktok:
                 return await this.tiktok.getAwemeData(mediaID, url);
             case Platform.x:

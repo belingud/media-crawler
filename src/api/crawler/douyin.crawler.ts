@@ -5,6 +5,8 @@ import { getDouyinDetailParams } from '../params';
 import { genParams } from '../../common/util';
 import { AxiosRequestConfig } from 'axios';
 import { lastValueFrom, map } from 'rxjs';
+import { PlaywrightService } from 'src/playwright/playwright.service';
+import * as playwright from 'playwright';
 
 export class DouYinCrawler extends BaseCrawler {
     #douyinHeaders: object = {
@@ -48,28 +50,45 @@ export class DouYinCrawler extends BaseCrawler {
      * @param {string} awemeID - The unique identifier for the DouYin video.
      * @return {Promise<any>} The data object containing the details of the aweme.
      */
-    async getAwemeData(awemeID: string): Promise<any> {
-        const domain: string = 'https://www.douyin.com';
-        const endpoint: string = '/aweme/v1/web/aweme/detail/';
-        let queryParams = await getDouyinDetailParams('old', awemeID);
-        queryParams['aweme_id'] = awemeID;
-
-        const queryString: string = genParams(queryParams);
-        let withParams: string = domain + endpoint + '?' + queryString;
-        const xb = this.genXBogus(queryString);
-        // const xb = new XBogus(this.#headers['User-Agent']).sign(queryString)[1];
-        let targetUrl: string = withParams + `&X-Bogus=${xb}/`;
-        console.log(`Start to query url: ${targetUrl}`);
-        const requestConfig: AxiosRequestConfig = {
-            headers: this.#douyinHeaders,
-        };
-        let data = await lastValueFrom(
-            this.http
-                .get(targetUrl, requestConfig)
-                .pipe(map((res) => res.data)),
-        );
-        console.log(data);
-        return data['aweme_detail'];
+    async getAwemeData(awemeID: string, url: string): Promise<any> {
+        const awemePageUrl: string = `https://www.douyin.com/video/${awemeID}?previous_page=web_code_link`;
+        const context = await playwright.chromium.launchPersistentContext('./user-data', {
+            channel: 'msedge',
+            headless: true,
+            args: ['--disable-blink-features=AutomationControlled'],
+            extraHTTPHeaders: {
+                'sec-ch-ua':
+                    '"Microsoft Edge";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
+            },
+            ...playwright.devices['Desktop Edge'],
+        })
+        const page = await context.newPage();
+        await page.setViewportSize({ width: 1280, height: 800 });
+        let result: any;
+        const waitForResponse = new Promise<void>((resolve) => {
+            page.on('response', async (response) => {
+              const url = response.url();
+              if (url.includes('douyin.com/aweme/v1/web/aweme/detail')) {
+                // console.log(`Request URL: ${url}`);
+                console.log('request aweme detail')
+                const responseBody = await response.json();
+                result = responseBody;
+                resolve(); // 请求完成，结束等待
+              }
+            });
+          });
+        await page.goto(awemePageUrl);
+        // 添加延迟和模拟用户行为
+        await page.waitForTimeout(5000); // 等待5秒
+        await page.mouse.move(100, 100);
+        await page.waitForTimeout(2000); // 再次等待2秒
+        await page.mouse.move(200, 200);
+        // 在页面中执行一些操作，比如滚动
+        await page.evaluate(() => window.scrollBy(0, 100));
+        await waitForResponse;
+        // 关闭浏览器
+        await context.close();
+        return result['aweme_detail'];
     }
 
     getOfficialAPIUrl(awemeID: string): object {
