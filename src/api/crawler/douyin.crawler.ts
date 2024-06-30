@@ -52,31 +52,45 @@ export class DouYinCrawler extends BaseCrawler {
      */
     async getAwemeData(awemeID: string, url: string): Promise<any> {
         const awemePageUrl: string = `https://www.douyin.com/video/${awemeID}?previous_page=web_code_link`;
-        const context = await playwright.chromium.launchPersistentContext('./user-data', {
-            channel: 'msedge',
-            headless: true,
-            args: ['--disable-blink-features=AutomationControlled'],
-            extraHTTPHeaders: {
-                'sec-ch-ua':
-                    '"Microsoft Edge";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
-            },
-            ...playwright.devices['Desktop Edge'],
-        })
+        const context = await playwright.chromium.launchPersistentContext(
+            './user-data',
+            {
+                channel: 'msedge',
+                headless: true,
+                args: [
+                    '--disable-blink-features=AutomationControlled',
+                    '--disable-features=IsolateOrigins,site-per-process',
+                ],
+                extraHTTPHeaders: {
+                    'sec-ch-ua':
+                        '"Microsoft Edge";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
+                    'Accept-Language': 'en-US,en;q=0.9',
+                    'Accept-Encoding': 'gzip, deflate, br',
+                    Referer: 'https://www.douyin.com/',
+                    'Sec-Fetch-Dest': 'document',
+                    'Sec-Fetch-Mode': 'navigate',
+                    'Sec-Fetch-Site': 'same-origin',
+                    'Sec-Fetch-User': '?1',
+                    'Upgrade-Insecure-Requests': '1',
+                },
+                ...playwright.devices['Desktop Edge'],
+            }
+        );
         const page = await context.newPage();
         await page.setViewportSize({ width: 1280, height: 800 });
         let result: any;
         const waitForResponse = new Promise<void>((resolve) => {
             page.on('response', async (response) => {
-              const url = response.url();
-              if (url.includes('douyin.com/aweme/v1/web/aweme/detail')) {
-                // console.log(`Request URL: ${url}`);
-                console.log('request aweme detail')
-                const responseBody = await response.json();
-                result = responseBody;
-                resolve(); // 请求完成，结束等待
-              }
+                const url = response.url();
+                if (url.includes('douyin.com/aweme/v1/web/aweme/detail')) {
+                    // console.log(`Request URL: ${url}`);
+                    console.log('request aweme detail');
+                    const responseBody = await response.json();
+                    result = responseBody;
+                    resolve(); // 请求完成，结束等待
+                }
             });
-          });
+        });
         await page.goto(awemePageUrl);
         // 添加延迟和模拟用户行为
         await page.waitForTimeout(5000); // 等待5秒
