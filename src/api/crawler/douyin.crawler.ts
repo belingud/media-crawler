@@ -1,12 +1,8 @@
 import { DouYinCookies, UserAgent } from '../../api.config';
 import { BaseCrawler } from './base.crawler';
 import { sign } from '../../common/X-Bogus';
-import { getDouyinDetailParams } from '../params';
-import { genParams } from '../../common/util';
-import { AxiosRequestConfig } from 'axios';
-import { lastValueFrom, map } from 'rxjs';
-import { PlaywrightService } from 'src/playwright/playwright.service';
 import * as playwright from 'playwright';
+import { PlaywrightService } from 'src/playwright/playwright.service';
 
 export class DouYinCrawler extends BaseCrawler {
     #douyinHeaders: object = {
@@ -28,7 +24,7 @@ export class DouYinCrawler extends BaseCrawler {
      */
     async getAwemeID(text: string): Promise<string> {
         /**Get douyin media id from url*/
-        let url = await this.convertShareUrl(text);
+        let url: string = await this.convertShareUrl(text);
         let mediaID: string;
         if (url.includes('/video/')) {
             mediaID = url.match(/\/video\/(\d+)/i)[1];
@@ -52,34 +48,13 @@ export class DouYinCrawler extends BaseCrawler {
      */
     async getAwemeData(awemeID: string, url: string): Promise<any> {
         const awemePageUrl: string = `https://www.douyin.com/video/${awemeID}?previous_page=web_code_link`;
-        const context = await playwright.chromium.launchPersistentContext(
-            './user-data',
-            {
-                channel: 'msedge',
-                headless: true,
-                args: [
-                    '--disable-blink-features=AutomationControlled',
-                    '--disable-features=IsolateOrigins,site-per-process',
-                ],
-                extraHTTPHeaders: {
-                    'sec-ch-ua':
-                        '"Microsoft Edge";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
-                    'Accept-Language': 'en-US,en;q=0.9',
-                    'Accept-Encoding': 'gzip, deflate, br',
-                    Referer: 'https://www.douyin.com/',
-                    'Sec-Fetch-Dest': 'document',
-                    'Sec-Fetch-Mode': 'navigate',
-                    'Sec-Fetch-Site': 'same-origin',
-                    'Sec-Fetch-User': '?1',
-                    'Upgrade-Insecure-Requests': '1',
-                },
-                ...playwright.devices['Desktop Edge'],
-            }
-        );
-        const page = await context.newPage();
+        const playwrightService: PlaywrightService = new PlaywrightService();
+        const context: playwright.BrowserContext =
+            await playwrightService.getPersistentChromiumContext();
+        const page: playwright.Page = await context.newPage();
         await page.setViewportSize({ width: 1280, height: 800 });
         let result: any;
-        const waitForResponse = new Promise<void>((resolve) => {
+        const waitForResponse: Promise<void> = new Promise<void>((resolve) => {
             page.on('response', async (response) => {
                 const url = response.url();
                 if (url.includes('douyin.com/aweme/v1/web/aweme/detail')) {
@@ -97,10 +72,9 @@ export class DouYinCrawler extends BaseCrawler {
         await page.mouse.move(100, 100);
         await page.waitForTimeout(2000); // 再次等待2秒
         await page.mouse.move(200, 200);
-        // 在页面中执行一些操作，比如滚动
+        // 在页面中执行滚动操作
         await page.evaluate(() => window.scrollBy(0, 100));
         await waitForResponse;
-        // 关闭浏览器
         await context.close();
         return result['aweme_detail'];
     }
@@ -116,5 +90,3 @@ export class DouYinCrawler extends BaseCrawler {
         return sign(query, this.#douyinHeaders['User-Agent']);
     }
 }
-// const d = new DouYinCrawler(new HttpService());
-// d.getAwemeData('7356162779423853824').then((res) => console.log(res));

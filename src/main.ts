@@ -1,6 +1,5 @@
 import 'dotenv/config';
-import * as fs from 'fs';
-import * as path from 'path';
+import http from 'http';
 import { NestFactory } from '@nestjs/core';
 import { NestApplicationOptions, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -10,30 +9,17 @@ import { LoggingInterceptor } from './interceptors/logging.interceptor';
 import { logger, loggerService } from './logger';
 import { HttpExceptionFilter } from './app.filter';
 
-const dev = process.env.NODE_ENV !== 'production';
-
 console.log('Environment: ', process.env.NODE_ENV);
 
 async function bootstrap() {
     let options: NestApplicationOptions = { cors: true };
-    if (!dev) {
-        console.log(__dirname);
-        options.httpsOptions = {
-            key: fs.readFileSync(
-                path.join(__dirname, '../../' + process.env.HTTPS_KEY)
-            ),
-            cert: fs.readFileSync(
-                path.join(__dirname, '../../' + process.env.HTTPS_CERT)
-            ),
-        };
-    }
-    const app = await NestFactory.create(AppModule, options);
+    const app = await NestFactory.create(AppModule);
     app.enableCors({
         origin: '*',
         methods: '*',
         credentials: true,
         allowedHeaders: '*',
-        maxAge: 3600,
+        maxAge: 36000,
         preflightContinue: true,
         optionsSuccessStatus: 200,
     });

@@ -22,6 +22,44 @@ export class PlaywrightService {
         return this.browser;
     }
 
+    /**
+     * Get the Chromium context with the specified options.
+     *
+     * @param {object} options - The options for configuring the Chromium context.
+     * @param {boolean} options.headless - Whether the browser should be launched in headless mode.
+     * @param {string} options.channel - The browser channel to use.
+     * @return {Promise<playwright.BrowserContext>} A Promise that resolves to the Chromium browser context.
+     */
+    async getPersistentChromiumContext(options?: {
+        headless: boolean;
+        channel: string;
+    }): Promise<playwright.BrowserContext> {
+        return await playwright.chromium.launchPersistentContext(
+            './user-data',
+            {
+                channel: options.channel || 'msedge',
+                headless: options.headless || true,
+                args: [
+                    '--disable-blink-features=AutomationControlled',
+                    '--disable-features=IsolateOrigins,site-per-process',
+                ],
+                extraHTTPHeaders: {
+                    'sec-ch-ua':
+                        '"Microsoft Edge";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
+                    'Accept-Language': 'en-US,en;q=0.9',
+                    'Accept-Encoding': 'gzip, deflate, br',
+                    Referer: 'https://www.douyin.com/',
+                    'Sec-Fetch-Dest': 'document',
+                    'Sec-Fetch-Mode': 'navigate',
+                    'Sec-Fetch-Site': 'same-origin',
+                    'Sec-Fetch-User': '?1',
+                    'Upgrade-Insecure-Requests': '1',
+                },
+                // ...playwright.devices['Desktop Edge'],
+            }
+        );
+    }
+
     async createBrowser(headless: boolean = true): Promise<playwright.Browser> {
         return await playwright.chromium.launch({
             channel: 'msedge',
@@ -103,7 +141,8 @@ export async function gotoxcom() {
 
     const context = await browser.newContext({
         extraHTTPHeaders: {
-            'sec-ch-ua': '"Microsoft Edge";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
+            'sec-ch-ua':
+                '"Microsoft Edge";v="123", "Not:A-Brand";v="8", "Chromium";v="123"',
         },
         ...playwright.devices['Desktop Edge'],
         proxy: { server: 'http://127.0.0.1:7890' },
@@ -113,8 +152,10 @@ export async function gotoxcom() {
 
     const page = await context.newPage();
     console.log('start to goto x.com');
-    page.on('console', message => console.log(message.text()));
-    page.on('request', request => console.log(request.method(), request.url(), request.headers()));
+    page.on('console', (message) => console.log(message.text()));
+    page.on('request', (request) =>
+        console.log(request.method(), request.url(), request.headers())
+    );
     await page.goto(
         'https://x.com/cooltechtipz/status/1794678910065717563?t=EUfvkW8koOkFh8p_hqrkgw&s=19'
     );

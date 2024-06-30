@@ -12,8 +12,8 @@ import { memo } from 'radash';
 interface AppConfig {
     NODE_ENV: string;
     PORT: number;
-    HTTPS_KEY: string;
-    HTTPS_CERT: string;
+    // HTTPS_KEY: string;
+    // HTTPS_CERT: string;
     DOUYIN: {
         cookie: string;
     };
@@ -72,8 +72,8 @@ function _getConfigs(): AppConfig {
     return {
         NODE_ENV: process.env.NODE_ENV || 'development',
         PORT: Number(process.env.port) || 3000,
-        HTTPS_KEY: join(ROOT, 'src/secret/privkey.pem'),
-        HTTPS_CERT: join(ROOT, 'src/secret/fullchain.pem'),
+        // HTTPS_KEY: join(ROOT, 'src/secret/privkey.pem'),
+        // HTTPS_CERT: join(ROOT, 'src/secret/fullchain.pem'),
         DOUYIN: {
             cookie: process.env.DOUYIN_COOKIE || '',
         },
