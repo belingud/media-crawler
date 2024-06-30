@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import http from 'http';
 import { NestFactory } from '@nestjs/core';
 import { NestApplicationOptions, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
