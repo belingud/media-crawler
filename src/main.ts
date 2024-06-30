@@ -12,7 +12,7 @@ console.log('Environment: ', process.env.NODE_ENV);
 
 async function bootstrap() {
     let options: NestApplicationOptions = { cors: true };
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule, options);
     app.enableCors({
         origin: '*',
         methods: '*',
