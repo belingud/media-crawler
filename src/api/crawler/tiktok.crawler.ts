@@ -145,8 +145,9 @@ export class TikTokCrawler extends BaseCrawler {
         //     queryParams
         // ).toString();
         const content = await this.playwright.getContent({
+            headless: false,
             url: url,
-            proxy: this.config.get<string>('PROXY_STRING'),
+            proxy: this.config.get<string>("PROXY_STRING"),
             geolocation: GeoCodeEnum.Singapore
         });
         if (!content) {

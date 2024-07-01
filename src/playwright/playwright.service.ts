@@ -31,8 +31,10 @@ export class PlaywrightService {
      * @return {Promise<playwright.BrowserContext>} A Promise that resolves to the Chromium browser context.
      */
     async getPersistentChromiumContext(options?: {
-        headless: boolean;
-        channel: string;
+        headless?: boolean;
+        channel?: string;
+        geolocation?: { latitude: number; longitude: number };
+        proxy?: string;
     }): Promise<playwright.BrowserContext> {
         return await playwright.chromium.launchPersistentContext(
             './user-data',
@@ -55,6 +57,10 @@ export class PlaywrightService {
                     'Sec-Fetch-User': '?1',
                     'Upgrade-Insecure-Requests': '1',
                 },
+                geolocation:
+                    options && options.geolocation ? options.geolocation : null,
+                proxy:
+                    options && options.proxy ? { server: options.proxy } : null,
                 // ...playwright.devices['Desktop Edge'],
             }
         );
@@ -76,21 +82,24 @@ export class PlaywrightService {
     }
 
     async getContent(options: {
+        headless: boolean;
         url: string;
         proxy?: string;
         geolocation?: string;
     }): Promise<string> {
-        const browser = await this.getBrowser();
+        // const browser = await this.getBrowser();
         let context: playwright.BrowserContext | null = null;
         let page: playwright.Page | null = null;
 
         try {
-            context = await browser.newContext(
-                this.getContextOptions({
-                    proxy: options.proxy,
-                    geolocation: options.geolocation,
-                })
-            );
+            context = await this.getPersistentChromiumContext({
+                headless: options ? options.headless : true,
+                channel: 'msedge',
+                geolocation: options.geolocation
+                    ? this.GeoMap[options.geolocation]
+                    : null,
+                proxy: options.proxy ? options.proxy : null,
+            });
             page = await context.newPage();
             await page.goto(options.url, { waitUntil: 'networkidle' });
             const cookies = await context.cookies();
