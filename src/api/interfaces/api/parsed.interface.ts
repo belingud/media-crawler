@@ -22,6 +22,10 @@ export declare interface VideoData {
     wm_video_url_HQ: string;
     nwm_video_url: string;
     nwm_video_url_HQ: string;
+    wm_video_url_list: string[];
+    wm_video_url_HQ_list: string[];
+    nwm_video_url_list: string[];
+    nwm_video_url_HQ_list: string[];
 }
 
 export declare interface AwemeImageData {

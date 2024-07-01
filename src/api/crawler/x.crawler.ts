@@ -119,15 +119,33 @@ export class XCrawler extends BaseCrawler {
             );
         }
         // TODO: 多个media的情况，同时有image和video的情况
-        const firstMediaType = awemeData.legacy.entities.media[0].type;
+        const mideas = awemeData.legacy.entities.media;
+        const video_url_list: string[] = [];
+        const img_url_list: string[] = [];
+        for (const media of mideas) {
+            if (media.type === 'photo') {
+                img_url_list.push(media.mediaUrlHttps);
+            } else if (media.type === 'video' || media.type === 'animated_gif') {
+                video_url_list.push(media.videoInfo.variants.at(-1).url);
+            }
+        }
+        let mediaType: string;
+        if (img_url_list.length > 0 && video_url_list.length == 0) {
+            mediaType = 'image';
+        } else if (img_url_list.length == 0 && video_url_list.length > 0) {
+            mediaType = 'video';
+        } else if (img_url_list.length > 0 && video_url_list.length > 0) {
+            mediaType = 'hybrid';
+        }
         const legacy: i.TweetLegacy = awemeData.legacy;
         const firstMedia: i.Media = awemeData.legacy.entities.media[0];
-        const mediaUrl: string = firstMedia.videoInfo.variants.at(-1).url;
+        // console.log("firstMedia:::", firstMedia);
+        // const mediaUrl: string = firstMedia.videoInfo.variants.at(-1).url;
         const user: i.User = awemeData.core.userResults.result as i.User;
         const data: ParsedData = {
             status: 'success',
             message: '',
-            type: firstMediaType,
+            type: mediaType,
             platform: Platform.x,
             aweme_id: firstMedia.idStr,
             thread_id: legacy.idStr,
@@ -138,12 +156,19 @@ export class XCrawler extends BaseCrawler {
                 api_url: firstMedia.url,
             },
             video_data: {
-                wm_video_url: mediaUrl,
-                wm_video_url_HQ: mediaUrl,
-                nwm_video_url: mediaUrl,
-                nwm_video_url_HQ: mediaUrl,
+                wm_video_url: video_url_list[0] || null,
+                wm_video_url_HQ: video_url_list[0] || null,
+                nwm_video_url: video_url_list[0] || null,
+                nwm_video_url_HQ: video_url_list[0] || null,
+                wm_video_url_list: video_url_list,
+                nwm_video_url_list: video_url_list,
+                wm_video_url_HQ_list: video_url_list,
+                nwm_video_url_HQ_list: video_url_list,
             },
-            image_data: null,
+            image_data: {
+                watermark_image_list: img_url_list,
+                no_watermark_image_list: img_url_list,
+            },
             author: {
                 screen_name: user.legacy.screenName,
                 uid: user.id,

@@ -202,9 +202,13 @@ export class TikTokCrawler extends BaseCrawler {
             hashtags: item['textExtra'] || [],
             video_data: {
                 wm_video_url: video['downloadAddr'],
+                wm_video_url_list: [video['downloadAddr']],
                 wm_video_url_HQ: video['downloadAddr'],
+                wm_video_url_HQ_list: [video['downloadAddr']],
                 nwm_video_url: video['playAddr'],
+                nwm_video_url_list: [video['playAddr']],
                 nwm_video_url_HQ: video['playAddr'],
+                nwm_video_url_HQ_list: [video['playAddr']],
             },
         };
         return data;

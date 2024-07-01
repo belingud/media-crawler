@@ -181,6 +181,8 @@ export class ApiService {
                 dynamic_cover: awemeData['video']['dynamic_cover'],
             },
             hashtags: awemeData['text_extra'],
+            video_data: {},
+            image_data: {},
         };
 
         let apiData: object = {};
@@ -203,9 +205,13 @@ export class ApiService {
                         apiData = {
                             video_data: {
                                 wm_video_url: wm_video_url,
+                                wm_video_url_list: [wm_video_url],
                                 wm_video_url_HQ: wm_video_url_HQ,
+                                wm_video_url_HQ_list: [wm_video_url_HQ],
                                 nwm_video_url: nwm_video_url,
+                                nwm_video_url_list: [nwm_video_url],
                                 nwm_video_url_HQ: nwm_video_url_HQ,
+                                nwm_video_url_HQ_list: [nwm_video_url_HQ],
                             },
                         };
                         break;
@@ -445,29 +451,33 @@ export class ApiService {
             aweme_id: data['aweme_id'],
             nickname: data['author']['nickname'],
             wm_video_url:
-                data['type'] === 'video'
+                data['type'] === 'video' || data['type'] === 'hybrid'
                     ? data['video_data']['wm_video_url']
                     : null,
             wm_video_url_HQ:
-                data['type'] === 'video'
+                data['type'] === 'video' || data['type'] === 'hybrid'
                     ? data['video_data']['wm_video_url_HQ']
                     : null,
             nwm_video_url:
-                data['type'] === 'video'
+                data['type'] === 'video' || data['type'] === 'hybrid'
                     ? data['video_data']['nwm_video_url']
                     : null,
             nwm_video_url_HQ:
-                data['type'] === 'video'
+                data['type'] === 'video' || data['type'] === 'hybrid'
                     ? data['video_data']['nwm_video_url_HQ']
                     : null,
             no_watermark_image_list:
-                data['type'] === 'image'
+                data['type'] === 'image' || data['type'] === 'hybrid'
                     ? data['image_data']['no_watermark_image_list']
                     : null,
             watermark_image_list:
-                data['type'] === 'image'
+                data['type'] === 'image' || data['type'] === 'hybrid'
                     ? data['image_data']['watermark_image_list']
                     : null,
+            wm_video_url_list: data['video_data']['wm_video_url_list'],
+            wm_video_url_HQ_list: data['video_data']['wm_video_url_HQ_list'],
+            nwm_video_url_list: data['video_data']['nwm_video_url_list'],
+            nwm_video_url_HQ_list: data['video_data']['nwm_video_url_HQ_list'],
         };
     }
 }
