@@ -36,10 +36,8 @@ export class PlaywrightService {
         geolocation?: { latitude: number; longitude: number };
         proxy?: string;
     }): Promise<playwright.BrowserContext> {
-        return await playwright.chromium.launchPersistentContext(
-            './user-data',
-            {
-                channel: options && options.channel ? options.channel : 'msedge',
+        const contextOptions: Record<string, any> = {
+            channel: options && options.channel ? options.channel : 'msedge',
                 headless: options && options.headless ? options.headless : true,
                 args: [
                     '--disable-blink-features=AutomationControlled',
@@ -57,12 +55,18 @@ export class PlaywrightService {
                     'Sec-Fetch-User': '?1',
                     'Upgrade-Insecure-Requests': '1',
                 },
-                geolocation:
-                    options && options.geolocation ? options.geolocation : null,
-                proxy:
-                    options && options.proxy ? { server: options.proxy } : null,
-                // ...playwright.devices['Desktop Edge'],
+        }
+        if (options && options.geolocation) {
+            contextOptions.geolocation = options.geolocation;
+        }
+        if (options && options.proxy) {
+            contextOptions.proxy = {
+                server: options.proxy
             }
+        }
+        return await playwright.chromium.launchPersistentContext(
+            './user-data',
+            contextOptions
         );
     }
 
