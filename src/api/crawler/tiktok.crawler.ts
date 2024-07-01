@@ -97,20 +97,20 @@ export class TikTokCrawler extends BaseCrawler {
             aweme_id: awemeID,
         };
         const paramsString: string = new URLSearchParams(
-            queryParams,
+            queryParams
         ).toString();
         const axiosConfig: AxiosRequestConfig = {
             headers: this.#tiktokHeaders,
         };
         if (this.config.get('DEFAULT_PROXY')) {
             axiosConfig['proxy'] = this.config.get<AxiosProxyConfig>(
-                'DEFAULT_PROXY_CONFIG',
+                'DEFAULT_PROXY_CONFIG'
             );
         }
         const detailUrl = `${TikTokApiUrl}?${paramsString}`;
         console.debug('detailUrl : ', detailUrl);
         let data = await lastValueFrom(
-            this.http.get(detailUrl, axiosConfig).pipe(map((res) => res.data)),
+            this.http.get(detailUrl, axiosConfig).pipe(map((res) => res.data))
         ).catch((error) => {
             logger.log(error);
             throw new NotFoundException('Media not found');
@@ -134,18 +134,18 @@ export class TikTokCrawler extends BaseCrawler {
         const context = await playwrightService.getPersistentChromiumContext({
             headless: true,
             channel: 'msedge',
-            proxy: this.config.get<string>("PROXY_STRING"),
+            proxy: this.config.get<string>('PROXY_STRING'),
         });
         const page = await context.newPage();
         await page.setViewportSize({ width: 1280, height: 800 });
         let content: any;
-        page.goto(url, { waitUntil: "commit"});
         const waitForResponse = page.waitForResponse(async response => {
             if (response.url().includes(waitUlrStr)) {
                 content = await response.text();
                 return true;
             }
         });
+        page.goto(url, { waitUntil: 'commit' });
         // 添加延迟和模拟用户行为
         await page.waitForTimeout(5000); // 等待5秒
         await page.mouse.move(100, 100);
@@ -153,6 +153,14 @@ export class TikTokCrawler extends BaseCrawler {
         await page.mouse.move(200, 200);
         // 在页面中执行滚动操作
         await page.evaluate(() => window.scrollBy(0, 100));
+        // const response = await page.waitForResponse((response) => {
+        //     console.log(response.url());
+        //     if (response.url().includes(waitUlrStr)) {
+        //         return true;
+        //     }
+        //     return false;
+        // });
+        // content = await response.text();
         await waitForResponse;
         if (!content) {
             throw new NotFoundException('Media not found');
