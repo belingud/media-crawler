@@ -133,7 +133,10 @@ export class TikTokCrawler extends BaseCrawler {
         }
         const playwrightService: PlaywrightService = new PlaywrightService();
         const context: playwright.BrowserContext =
-            await playwrightService.getPersistentChromiumContext();
+            await playwrightService.getPersistentChromiumContext({
+                headless: true,
+                proxy: this.config.get<string>("PROXY_STRING"),
+            });
         const page: playwright.Page = await context.newPage();
         await page.setViewportSize({ width: 1280, height: 800 });
         let content: any;

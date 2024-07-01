@@ -39,8 +39,8 @@ export class PlaywrightService {
         return await playwright.chromium.launchPersistentContext(
             './user-data',
             {
-                channel: options ? options.channel : 'msedge',
-                headless: options ? options.headless : true,
+                channel: options && options.channel ? options.channel : 'msedge',
+                headless: options && options.headless ? options.headless : true,
                 args: [
                     '--disable-blink-features=AutomationControlled',
                     '--disable-features=IsolateOrigins,site-per-process',
