@@ -1,3 +1,4 @@
+import playwright from 'playwright';
 import { AxiosProxyConfig, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { BaseCrawler } from './base.crawler';
 import { firstValueFrom, lastValueFrom, map } from 'rxjs';
@@ -130,26 +131,35 @@ export class TikTokCrawler extends BaseCrawler {
         if (!url.includes(awemeID)) {
             throw new NotFoundException('Media not found');
         }
-        // const queryParams = {
-        //     iid: '7318518857994389254',
-        //     device_id: '7318517321748022790',
-        //     channel: 'googleplay',
-        //     app_name: 'musical_ly',
-        //     version_code: '300904',
-        //     device_platform: 'android',
-        //     device_type: 'ASUS_Z01QD',
-        //     os_version: '9',
-        //     aweme_id: awemeID,
-        // };
-        // const paramsString: string = new URLSearchParams(
-        //     queryParams
-        // ).toString();
-        const content = await this.playwright.getContent({
-            headless: true,
-            url: url,
-            proxy: this.config.get<string>("PROXY_STRING"),
-            geolocation: GeoCodeEnum.Singapore
+        const playwrightService: PlaywrightService = new PlaywrightService();
+        const context: playwright.BrowserContext =
+            await playwrightService.getPersistentChromiumContext();
+        const page: playwright.Page = await context.newPage();
+        await page.setViewportSize({ width: 1280, height: 800 });
+        let content: any;
+        const waitForResponse: Promise<void> = new Promise<void>((resolve) => {
+            page.on('response', async (response) => {
+                const url = response.url();
+                if (url.includes('@joeltay/video/7355070358954773761')) {
+                    // console.log(`Request URL: ${url}`);
+                    content = await response.text();
+                    resolve(); // 请求完成，结束等待
+                }
+            });
         });
+        await playwrightService.mockMouseMove(page);
+        await page.goto(url);
+
+        await waitForResponse;
+        await page.close();
+        await context.close();
+
+        // const content = await this.playwright.getContent({
+        //     headless: true,
+        //     url: url,
+        //     proxy: this.config.get<string>("PROXY_STRING"),
+        //     geolocation: GeoCodeEnum.Singapore
+        // });
         if (!content) {
             throw new NotFoundException('Media not found');
         }

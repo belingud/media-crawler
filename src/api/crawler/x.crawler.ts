@@ -118,7 +118,6 @@ export class XCrawler extends BaseCrawler {
                 'This Tweet not contain a video or image'
             );
         }
-        // TODO: 多个media的情况，同时有image和video的情况
         const mideas = awemeData.legacy.entities.media;
         const video_url_list: string[] = [];
         const img_url_list: string[] = [];

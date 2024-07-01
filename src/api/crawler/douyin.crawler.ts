@@ -75,6 +75,7 @@ export class DouYinCrawler extends BaseCrawler {
         // 在页面中执行滚动操作
         await page.evaluate(() => window.scrollBy(0, 100));
         await waitForResponse;
+        await page.close();
         await context.close();
         return result['aweme_detail'];
     }

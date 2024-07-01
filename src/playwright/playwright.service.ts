@@ -103,7 +103,7 @@ export class PlaywrightService {
             page = await context.newPage();
             await page.goto(options.url, { waitUntil: 'networkidle' });
             const cookies = await context.cookies();
-            logger.info(`Cookies: ${cookies}`);
+            logger.debug(`Cookies: ${cookies}`);
             return await page.content();
         } catch (error) {
             logger.error('Failed to get content:', error);
@@ -116,6 +116,16 @@ export class PlaywrightService {
                 await context.close();
             }
         }
+    }
+
+    async mockMouseMove(page: playwright.Page) {
+        // 添加延迟和模拟用户行为
+        await page.waitForTimeout(5000); // 等待5秒
+        await page.mouse.move(100, 100);
+        await page.waitForTimeout(2000); // 再次等待2秒
+        await page.mouse.move(200, 200);
+        // 在页面中执行滚动操作
+        await page.evaluate(() => window.scrollBy(0, 100));
     }
 
     private getContextOptions(options?: {
