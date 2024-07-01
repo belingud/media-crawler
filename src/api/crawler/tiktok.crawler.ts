@@ -1,4 +1,3 @@
-import playwright from 'playwright';
 import { AxiosProxyConfig, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { BaseCrawler } from './base.crawler';
 import { firstValueFrom, lastValueFrom, map } from 'rxjs';
@@ -8,7 +7,6 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { CONFIGURATION_SERVICE_TOKEN } from '@nestjs/config/dist/config.constants';
 import { PlaywrightService } from 'src/playwright/playwright.service';
-import { GeoCodeEnum } from 'src/playwright/playwright.enum';
 
 const logger: Logger = new Logger('TikTokCrawler');
 
@@ -131,43 +129,35 @@ export class TikTokCrawler extends BaseCrawler {
         if (!url.includes(awemeID)) {
             throw new NotFoundException('Media not found');
         }
+        const waitUlrStr = url.slice(8);
         const playwrightService: PlaywrightService = new PlaywrightService();
-        const context: playwright.BrowserContext =
-            await playwrightService.getPersistentChromiumContext({
-                headless: true,
-                proxy: this.config.get<string>("PROXY_STRING"),
-            });
-        const page: playwright.Page = await context.newPage();
+        const context = await playwrightService.getPersistentChromiumContext({
+            headless: true,
+            channel: 'msedge',
+            proxy: this.config.get<string>("PROXY_STRING"),
+        });
+        const page = await context.newPage();
         await page.setViewportSize({ width: 1280, height: 800 });
         let content: any;
-        const waitForResponse: Promise<void> = new Promise<void>((resolve) => {
-            page.on('response', async (response) => {
-                const url = response.url();
-                if (url.includes('@joeltay/video/7355070358954773761')) {
-                    // console.log(`Request URL: ${url}`);
-                    content = await response.text();
-                    resolve(); // 请求完成，结束等待
-                }
-            });
+        page.goto(url, { waitUntil: "commit"});
+        const waitForResponse = page.waitForResponse(async response => {
+            if (response.url().includes(waitUlrStr)) {
+                content = await response.text();
+                return true;
+            }
         });
-        await playwrightService.mockMouseMove(page);
-        await page.goto(url);
-
+        // 添加延迟和模拟用户行为
+        await page.waitForTimeout(5000); // 等待5秒
+        await page.mouse.move(100, 100);
+        await page.waitForTimeout(2000); // 再次等待2秒
+        await page.mouse.move(200, 200);
+        // 在页面中执行滚动操作
+        await page.evaluate(() => window.scrollBy(0, 100));
         await waitForResponse;
-        await page.close();
-        await context.close();
-
-        // const content = await this.playwright.getContent({
-        //     headless: true,
-        //     url: url,
-        //     proxy: this.config.get<string>("PROXY_STRING"),
-        //     geolocation: GeoCodeEnum.Singapore
-        // });
         if (!content) {
             throw new NotFoundException('Media not found');
         }
         const match: RegExpMatchArray = this.#videoInfoPattern.exec(content);
-        logger.log('match: ', match);
         if (!match) {
             throw new NotFoundException('Media not found');
         }

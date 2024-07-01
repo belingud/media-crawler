@@ -105,7 +105,8 @@ export class PlaywrightService {
                 proxy: options.proxy ? options.proxy : null,
             });
             page = await context.newPage();
-            await page.goto(options.url, { waitUntil: 'networkidle' });
+            await page.goto(options.url, { waitUntil: 'domcontentloaded' });
+            await this.mockMouseMove(page);
             const cookies = await context.cookies();
             logger.debug(`Cookies: ${cookies}`);
             return await page.content();
