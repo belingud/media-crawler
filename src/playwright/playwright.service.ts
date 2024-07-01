@@ -103,7 +103,7 @@ export class PlaywrightService {
             page = await context.newPage();
             await page.goto(options.url, { waitUntil: 'networkidle' });
             const cookies = await context.cookies();
-            logger.debug(`Cookies: ${cookies}`);
+            logger.info(`Cookies: ${cookies}`);
             return await page.content();
         } catch (error) {
             logger.error('Failed to get content:', error);

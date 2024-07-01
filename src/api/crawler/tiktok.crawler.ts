@@ -154,6 +154,7 @@ export class TikTokCrawler extends BaseCrawler {
             throw new NotFoundException('Media not found');
         }
         const match: RegExpMatchArray = this.#videoInfoPattern.exec(content);
+        logger.log('match: ', match);
         if (!match) {
             throw new NotFoundException('Media not found');
         }
